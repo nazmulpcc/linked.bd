@@ -13,7 +13,7 @@
 
   * [x] Install/configure Google OAuth provider
   * [x] Implement login flow (redirect to Google, callback handling, session login)
-  * [ ] Implement logout
+  * [x] Implement logout
   * [x] Create/update `users` table fields required for OAuth identity
   * [ ] Create authenticated middleware-protected dashboard entry route
   * [x] Add UI: “Continue with Google” button and minimal auth landing page
