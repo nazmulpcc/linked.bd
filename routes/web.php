@@ -52,4 +52,9 @@ Route::middleware(['auth', 'verified'])
 
 require __DIR__.'/settings.php';
 
-Route::middleware('web')->get('/{slug}', RedirectController::class)->name('links.redirect');
+Route::middleware('web')
+    ->get('/{slug}', [RedirectController::class, 'show'])
+    ->name('links.redirect');
+Route::middleware('web')
+    ->post('/{slug}', [RedirectController::class, 'unlock'])
+    ->name('links.unlock');

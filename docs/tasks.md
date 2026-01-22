@@ -98,16 +98,16 @@
   * [x] Implement redirect response (fast path)
   * [x] Acceptance: visiting short URL redirects correctly across platform and custom domains
 
-* [ ] 7. Password-protected links (public)
+* [x] 7. Password-protected links (public)
 
-  * [ ] If link has password:
+  * [x] If link has password:
 
-    * [ ] Show password prompt page on GET
-    * [ ] Validate password on POST
-    * [ ] On success, perform redirect
-    * [ ] On failure, show error state (no redirect)
-  * [ ] Add basic throttling for password attempts (per IP/slug) if feasible day-one
-  * [ ] Acceptance: protected links never redirect without correct password
+    * [x] Show password prompt page on GET
+    * [x] Validate password on POST
+    * [x] On success, perform redirect
+    * [x] On failure, show error state (no redirect)
+  * [x] Add basic throttling for password attempts (per IP/slug) if feasible day-one
+  * [x] Acceptance: protected links never redirect without correct password
 
 * [ ] 8. Click analytics (queue-first)
 
