@@ -49,6 +49,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 ## Documentation Files
 - You must only create documentation files if explicitly requested by the user.
+- We have a `docs` folder which holds project requirements, technical specifcation & also tracks tasks.
 
 === boost rules ===
 
@@ -228,6 +229,8 @@ Route::get('/users', function () {
 
 ### Models
 - Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing conventions from other models.
+- Do not use `fillable` or `guarded` properties, model guarding is disabled in this project.
+- When you create a migration, update the property documentation in the respective model's doc block.
 
 === wayfinder/core rules ===
 
@@ -240,6 +243,7 @@ Wayfinder generates TypeScript functions and types for Laravel controllers and r
 - Always prefer named imports for tree-shaking (e.g., `import { show } from '@/actions/...'`).
 - Avoid default controller imports (prevents tree-shaking).
 - Run `php artisan wayfinder:generate` after route changes if Vite plugin isn't installed.
+- Always create and dispatch laravel event classes when important business event happens. For example, user registration is an important event, but Laravel already has an event for that, so we don't need to create one. But a product creation, user buying a subscription etc should have their own event classes.
 
 ### Feature Overview
 - Form Support: Use `.form()` with `--with-form` flag for HTML form attributes — `<form {...store.form()}>` → `action="/posts" method="post"`.

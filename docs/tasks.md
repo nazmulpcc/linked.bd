@@ -1,0 +1,184 @@
+* [ ] 0. Project setup and baseline
+
+  * [x] Initialize Laravel 12 project and environment configuration (local + production-ready env structure)
+  * [ ] Configure MariaDB connection and run baseline migration
+  * [ ] Configure Inertia + Vue 3 integration and verify page rendering
+  * [ ] Configure TailwindCSS v4 and set up global layout styles
+  * [ ] Set up app layout shell (navigation, container, page header, flash/toast placeholder)
+  * [ ] Define route groups: dashboard (auth), public (redirect/create), domain verification (auth)
+  * [ ] Add basic error pages/views for 404 and expired/deleted states
+
+* [ ] 1. Authentication (Google OAuth)
+
+  * [ ] Install/configure Google OAuth provider
+  * [ ] Implement login flow (redirect to Google, callback handling, session login)
+  * [ ] Implement logout
+  * [ ] Create/update `users` table fields required for OAuth identity
+  * [ ] Create authenticated middleware-protected dashboard entry route
+  * [ ] Add UI: “Continue with Google” button and minimal auth landing page
+  * [ ] Acceptance: user can sign in/out and access dashboard
+
+* [ ] 2. Data model (domains, links, optional guest tokens)
+
+  * [ ] Create `domains` table (hostname, type, status, verification metadata, user ownership for custom)
+  * [ ] Create `links` table (domain_id, user_id nullable, code, alias nullable, destination_url, password_hash nullable, expires_at nullable, click_count, last_accessed_at, qr reference)
+  * [ ] Add indexes/uniqueness constraints:
+
+    * [ ] domains.hostname unique
+    * [ ] links (domain_id, code) indexed/unique as needed
+    * [ ] links (domain_id, alias) unique where alias not null
+    * [ ] expires_at indexed
+  * [ ] Add optional `link_access_tokens` table (only if implementing guest “manage link” token)
+  * [ ] Seed or ensure platform domain(s) exist (or configure platform domains list in config)
+  * [ ] Acceptance: migrations run cleanly; constraints match alias policy
+
+* [ ] 3. Domain management (custom domains + verification)
+
+  * [ ] Build dashboard UI: domain list page (status, hostname, actions)
+  * [ ] Build “Add domain” flow (input hostname, create pending verification record)
+  * [ ] Generate verification token/value and store it
+  * [ ] Build verification instructions UI (what TXT record to set, value to use)
+  * [ ] Implement “Verify now” action that checks DNS TXT and updates status to verified
+  * [ ] Block link creation on custom domains unless domain is verified
+  * [ ] Implement disable/remove domain actions (remove only if no links or handle policy)
+  * [ ] Acceptance: user can add a domain, verify via DNS TXT, then use it for links
+
+* [ ] 4. Link creation (platform + custom domain rules)
+
+  * [ ] Build link creation UI (single-screen form)
+
+    * [ ] Destination URL input + validation feedback
+    * [ ] Domain selector (platform domains + verified custom domains)
+    * [ ] Alias field shown only when custom domain selected
+    * [ ] Password toggle + password field
+    * [ ] Expiry toggle + expiry input (date/time or duration)
+  * [ ] Implement backend validation rules:
+
+    * [ ] Allow only http/https destination URLs; reject unsafe schemes
+    * [ ] Platform domain: alias must be empty; code auto-generated
+    * [ ] Custom domain: alias allowed (required if you choose); enforce allowed charset/length and uniqueness per domain
+  * [ ] Implement short code generation with collision retry
+  * [ ] Store password as secure hash (never plaintext)
+  * [ ] Store expiry in `expires_at` when provided
+  * [ ] Implement guest creation endpoint/page (no login required)
+
+    * [ ] Guest links get an implicit expiry based on configurable TTL (created_at + N days) if no explicit expiry
+  * [ ] Post-create success page:
+
+    * [ ] Display short URL with copy button
+    * [ ] Display link status (password on/off, expiry date)
+    * [ ] QR preview placeholder (shows “generating” until ready)
+  * [ ] Acceptance: platform links auto-code; custom domain links allow alias; guest links created successfully
+
+* [ ] 5. Link listing and management (dashboard)
+
+  * [ ] Build links list page (cards/table)
+
+    * [ ] Show short URL, destination URL, domain, click count, last accessed, expiry status
+    * [ ] Provide delete action per link
+  * [ ] Implement server-side pagination/sorting (minimal: newest first)
+  * [ ] Implement hard delete for authenticated user-owned links
+  * [ ] Enforce ownership checks on all link management actions
+  * [ ] Acceptance: user sees only their links; can delete; list updates correctly
+
+* [ ] 6. Public redirect resolution (host-based)
+
+  * [ ] Implement hostname resolution:
+
+    * [ ] Determine if request host is platform domain or verified custom domain
+    * [ ] If custom domain not verified/unknown, treat as not found
+  * [ ] Implement slug resolution:
+
+    * [ ] Platform domains: resolve by `code`
+    * [ ] Custom domains: resolve by `alias` (and optionally by `code` fallback if supported)
+  * [ ] Implement expiry checks:
+
+    * [ ] If expired -> show expired/deleted page (no redirect)
+  * [ ] Implement redirect response (fast path)
+  * [ ] Acceptance: visiting short URL redirects correctly across platform and custom domains
+
+* [ ] 7. Password-protected links (public)
+
+  * [ ] If link has password:
+
+    * [ ] Show password prompt page on GET
+    * [ ] Validate password on POST
+    * [ ] On success, perform redirect
+    * [ ] On failure, show error state (no redirect)
+  * [ ] Add basic throttling for password attempts (per IP/slug) if feasible day-one
+  * [ ] Acceptance: protected links never redirect without correct password
+
+* [ ] 8. Click analytics (queue-first)
+
+  * [ ] Define analytics update behavior:
+
+    * [ ] Increment click_count
+    * [ ] Update last_accessed_at
+  * [ ] Implement `RecordLinkClick` job and dispatch it on successful redirect
+  * [ ] Implement safe fallback to synchronous atomic DB update if queue not available
+  * [ ] Ensure analytics not recorded for:
+
+    * [ ] expired/deleted
+    * [ ] failed password attempts
+  * [ ] Acceptance: clicks increment and last_accessed_at updates without slowing redirect
+
+* [ ] 9. QR code generation and download
+
+  * [ ] Choose QR output format (PNG or SVG) and storage target (local/S3-configurable)
+  * [ ] Implement `GenerateQrForLink` job dispatched after link creation
+  * [ ] Store QR reference/path on link record
+  * [ ] Implement QR retrieval endpoint:
+
+    * [ ] Authenticated owners can download their QR
+    * [ ] Guest-created links: allow download from success page (use signed URL/token if needed)
+  * [ ] Update UI to show QR preview when ready and provide download action
+  * [ ] Acceptance: every link produces a downloadable QR; UI reflects “generating” then “ready”
+
+* [ ] 10. Scheduler: expiry + guest auto-deletion (hard delete)
+
+  * [ ] Implement scheduled command/job to hard delete expired links
+  * [ ] Implement scheduled command/job to hard delete guest links past configured TTL
+  * [ ] Ensure QR assets removed when link is deleted/expired
+  * [ ] Add safety sweep to remove orphaned QR assets (optional)
+  * [ ] Configure scheduler cadence (e.g., hourly) and document required cron entry
+  * [ ] Acceptance: expired and guest TTL links disappear automatically and stop working
+
+* [ ] 11. Queue infrastructure and reliability
+
+  * [ ] Configure queue driver for day-one (database recommended unless Redis available)
+  * [ ] Create queue tables and failed jobs table
+  * [ ] Document how to run queue worker(s) in production
+  * [ ] Ensure QR and click jobs are idempotent enough for retries
+  * [ ] Acceptance: jobs process successfully; failures are observable and retryable
+
+* [ ] 12. UI/UX polish (minimal modern design)
+
+  * [ ] Define friendly color palette + typography scale in Tailwind config
+  * [ ] Build reusable UI components:
+
+    * [ ] Buttons, inputs, toggles, cards, badges, empty states
+    * [ ] Toast/flash messages for copy/create/delete/verify actions
+  * [ ] Ensure forms have clear validation states and helper text
+  * [ ] Add consistent loading states (domain verify, create link, QR generating)
+  * [ ] Add dark mode support if time allows
+  * [ ] Acceptance: UI is consistent, minimal, and pleasant with clear states
+
+* [ ] 13. Validation, abuse controls, and security checks
+
+  * [ ] Destination URL validation (block dangerous schemes; optional internal IP blocking)
+  * [ ] Rate limit guest link creation (per IP) if feasible day-one
+  * [ ] Ensure domain ownership enforced; prevent claiming domains already registered
+  * [ ] Ensure redirect route avoids heavy middleware and leaks no sensitive info
+  * [ ] Acceptance: obvious abuse vectors mitigated without adding complexity
+
+* [ ] 14. Final verification against acceptance criteria
+
+  * [ ] Google sign-in works; dashboard accessible
+  * [ ] Custom domain add + DNS TXT verify works
+  * [ ] Platform link creation works (auto code only)
+  * [ ] Custom domain link creation works (custom alias)
+  * [ ] Password protection flow works end-to-end
+  * [ ] QR generated + downloadable
+  * [ ] Click count increments + last accessed updates
+  * [ ] Manual delete hard deletes and link stops working immediately
+  * [ ] Scheduled expiry/guest cleanup hard deletes and links stop working
