@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\Domains\DomainController;
 use App\Http\Controllers\Links\LinkController;
+use App\Http\Controllers\Links\LinkManagementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -31,6 +32,10 @@ Route::middleware(['auth', 'verified'])
         Route::get('/', function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
+
+        Route::get('/links', [LinkManagementController::class, 'index'])->name('links.index');
+        Route::delete('/links/{link}', [LinkManagementController::class, 'destroy'])
+            ->name('links.destroy');
     });
 
 Route::middleware(['auth', 'verified'])
