@@ -82,21 +82,21 @@
   * [x] Enforce ownership checks on all link management actions
   * [x] Acceptance: user sees only their links; can delete; list updates correctly
 
-* [ ] 6. Public redirect resolution (host-based)
+* [x] 6. Public redirect resolution (host-based)
 
-  * [ ] Implement hostname resolution:
+  * [x] Implement hostname resolution:
 
-    * [ ] Determine if request host is platform domain or verified custom domain
-    * [ ] If custom domain not verified/unknown, treat as not found
-  * [ ] Implement slug resolution:
+    * [x] Determine if request host is platform domain or verified custom domain
+    * [x] If custom domain not verified/unknown, treat as not found
+  * [x] Implement slug resolution:
 
-    * [ ] Platform domains: resolve by `code`
-    * [ ] Custom domains: resolve by `alias` (and optionally by `code` fallback if supported)
-  * [ ] Implement expiry checks:
+    * [x] Platform domains: resolve by `code`
+    * [x] Custom domains: resolve by `alias` (and optionally by `code` fallback if supported)
+  * [x] Implement expiry checks:
 
-    * [ ] If expired -> show expired/deleted page (no redirect)
-  * [ ] Implement redirect response (fast path)
-  * [ ] Acceptance: visiting short URL redirects correctly across platform and custom domains
+    * [x] If expired -> show expired/deleted page (no redirect)
+  * [x] Implement redirect response (fast path)
+  * [x] Acceptance: visiting short URL redirects correctly across platform and custom domains
 
 * [ ] 7. Password-protected links (public)
 

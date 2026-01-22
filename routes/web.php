@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\Domains\DomainController;
 use App\Http\Controllers\Links\LinkController;
 use App\Http\Controllers\Links\LinkManagementController;
+use App\Http\Controllers\Links\RedirectController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -50,3 +51,5 @@ Route::middleware(['auth', 'verified'])
     });
 
 require __DIR__.'/settings.php';
+
+Route::middleware('web')->get('/{slug}', RedirectController::class)->name('links.redirect');
