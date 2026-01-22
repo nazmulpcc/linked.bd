@@ -49,7 +49,7 @@ return [
 
         'qr_code' => [
             'driver' => 'local',
-            'root' => storage_path('app/qr_code'),
+            'root' => storage_path('app/private/qr_codes'),
             'visibility' => 'private',
             'throw' => false,
             'report' => false,
