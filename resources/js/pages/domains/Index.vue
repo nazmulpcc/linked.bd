@@ -46,7 +46,7 @@ const recordName = (hostname: string) => `_shortlink.${hostname}`;
         <div class="grid gap-8">
             <section class="rounded-2xl border border-border/70 bg-card p-6">
                 <Form
-                    v-bind="store.form()"
+                    v-bind="store()"
                     v-slot="{ errors, processing }"
                     class="grid gap-4"
                 >
@@ -117,21 +117,21 @@ const recordName = (hostname: string) => `_shortlink.${hostname}`;
                     <div class="mt-6 flex flex-wrap gap-2">
                         <Form
                             v-if="domain.status === 'pending_verification'"
-                            v-bind="verify.form(domain.id)"
+                            v-bind="verify(domain.id)"
                         >
                             <Button type="submit" size="sm">Verify now</Button>
                         </Form>
 
                         <Form
                             v-if="domain.status !== 'disabled'"
-                            v-bind="disable.form(domain.id)"
+                            v-bind="disable(domain.id)"
                         >
                             <Button type="submit" size="sm" variant="secondary">
                                 Disable
                             </Button>
                         </Form>
 
-                        <Form v-if="domain.links_count === 0" v-bind="destroy.form(domain.id)">
+                        <Form v-if="domain.links_count === 0" v-bind="destroy(domain.id)">
                             <Button type="submit" size="sm" variant="ghost">
                                 Remove
                             </Button>
