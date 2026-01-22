@@ -71,16 +71,16 @@
     * [x] QR preview placeholder (shows “generating” until ready)
   * [x] Acceptance: platform links auto-code; custom domain links allow alias; guest links created successfully
 
-* [ ] 5. Link listing and management (dashboard)
+* [x] 5. Link listing and management (dashboard)
 
-  * [ ] Build links list page (cards/table)
+  * [x] Build links list page (cards/table)
 
-    * [ ] Show short URL, destination URL, domain, click count, last accessed, expiry status
-    * [ ] Provide delete action per link
-  * [ ] Implement server-side pagination/sorting (minimal: newest first)
-  * [ ] Implement hard delete for authenticated user-owned links
-  * [ ] Enforce ownership checks on all link management actions
-  * [ ] Acceptance: user sees only their links; can delete; list updates correctly
+    * [x] Show short URL, destination URL, domain, click count, last accessed, expiry status
+    * [x] Provide delete action per link
+  * [x] Implement server-side pagination/sorting (minimal: newest first)
+  * [x] Implement hard delete for authenticated user-owned links
+  * [x] Enforce ownership checks on all link management actions
+  * [x] Acceptance: user sees only their links; can delete; list updates correctly
 
 * [ ] 6. Public redirect resolution (host-based)
 
