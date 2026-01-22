@@ -50,7 +50,7 @@ class RedirectController extends Controller
         ]);
     }
 
-    public function unlock(UnlockLinkRequest $request, string $slug): RedirectResponse
+    public function unlock(UnlockLinkRequest $request, string $slug)
     {
         $domain = $this->resolveDomain($request);
 
@@ -69,7 +69,7 @@ class RedirectController extends Controller
         }
 
         if (! $link->password_hash) {
-            return redirect()->away($link->destination_url);
+            return Inertia::location($link->destination_url);
         }
 
         $key = $this->throttleKey($request, $slug);
@@ -94,7 +94,7 @@ class RedirectController extends Controller
 
         RateLimiter::clear($key);
 
-        return redirect()->away($link->destination_url);
+        return Inertia::location($link->destination_url);
     }
 
     private function resolveDomain(Request $request): ?Domain
