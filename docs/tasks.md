@@ -33,15 +33,15 @@
   * [x] Seed or ensure platform domain(s) exist (or configure platform domains list in config)
   * [x] Acceptance: migrations run cleanly; constraints match alias policy
 
-* [ ] 3. Domain management (custom domains + verification)
+* [x] 3. Domain management (custom domains + verification)
 
-  * [ ] Build dashboard UI: domain list page (status, hostname, actions)
-  * [ ] Build “Add domain” flow (input hostname, create pending verification record)
-  * [ ] Generate verification token/value and store it
-  * [ ] Build verification instructions UI (what TXT record to set, value to use)
-  * [ ] Implement “Verify now” action that checks DNS TXT and updates status to verified
+  * [x] Build dashboard UI: domain list page (status, hostname, actions)
+  * [x] Build “Add domain” flow (input hostname, create pending verification record)
+  * [x] Generate verification token/value and store it
+  * [x] Build verification instructions UI (what TXT record to set, value to use)
+  * [x] Implement “Verify now” action that checks DNS TXT and updates status to verified
   * [ ] Block link creation on custom domains unless domain is verified
-  * [ ] Implement disable/remove domain actions (remove only if no links or handle policy)
+  * [x] Implement disable/remove domain actions (remove only if no links or handle policy)
   * [ ] Acceptance: user can add a domain, verify via DNS TXT, then use it for links
 
 * [ ] 4. Link creation (platform + custom domain rules)
