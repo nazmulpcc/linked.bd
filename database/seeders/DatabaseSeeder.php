@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PlatformDomainSeeder::class);
+        $this->call(SystemDomainSeeder::class);
 
         // User::factory(10)->create();
 

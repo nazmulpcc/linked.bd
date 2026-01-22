@@ -23,6 +23,7 @@ const props = defineProps<{
 const selectedDomainId = ref(
     props.domains.length ? String(props.domains[0].id) : '',
 );
+const showAdvanced = ref(false);
 const showPassword = ref(false);
 const showExpiry = ref(false);
 
@@ -63,86 +64,106 @@ const selectClass =
                         <InputError :message="errors.destination_url" />
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="domain_id">Domain</Label>
-                        <select
-                            id="domain_id"
-                            name="domain_id"
-                            :class="selectClass"
-                            v-model="selectedDomainId"
+                    <input
+                        v-if="!showAdvanced"
+                        type="hidden"
+                        name="domain_id"
+                        :value="selectedDomainId"
+                    >
+
+                    <div class="grid gap-3">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            class="w-fit px-0 text-sm"
+                            @click="showAdvanced = !showAdvanced"
                         >
-                            <option
-                                v-for="domain in domains"
-                                :key="domain.id"
-                                :value="String(domain.id)"
-                            >
-                                {{ domain.hostname }}
-                                <span v-if="domain.type === 'platform'">
-                                    (platform)
-                                </span>
-                            </option>
-                        </select>
+                            {{ showAdvanced ? 'Hide' : 'Show' }} advanced settings
+                        </Button>
                         <InputError :message="errors.domain_id" />
                     </div>
 
-                    <div v-if="isCustomDomain" class="grid gap-2">
-                        <Label for="alias">Custom alias (optional)</Label>
-                        <Input
-                            id="alias"
-                            name="alias"
-                            placeholder="launch"
-                            autocomplete="off"
-                        />
-                        <InputError :message="errors.alias" />
-                    </div>
-
-                    <div class="grid gap-3">
-                        <label class="flex items-center gap-3 text-sm">
-                            <input
-                                v-model="showPassword"
-                                type="checkbox"
-                                class="size-4 rounded border-input"
+                    <div v-if="showAdvanced" class="grid gap-6">
+                        <div class="grid gap-2">
+                            <Label for="domain_id">Domain</Label>
+                            <select
+                                id="domain_id"
+                                name="domain_id"
+                                :class="selectClass"
+                                v-model="selectedDomainId"
                             >
-                            Add a password
-                        </label>
-                        <div v-if="showPassword" class="grid gap-2">
-                            <Label for="password">Password</Label>
-                            <Input
-                                id="password"
-                                name="password"
-                                type="password"
-                                placeholder="••••••••"
-                                autocomplete="new-password"
-                            />
-                            <InputError :message="errors.password" />
+                                <option
+                                    v-for="domain in domains"
+                                    :key="domain.id"
+                                    :value="String(domain.id)"
+                                >
+                                    {{ domain.hostname }}
+                                    <span v-if="domain.type === 'platform'">
+                                        (platform)
+                                    </span>
+                                </option>
+                            </select>
                         </div>
-                    </div>
 
-                    <div class="grid gap-3">
-                        <label class="flex items-center gap-3 text-sm">
-                            <input
-                                v-model="showExpiry"
-                                type="checkbox"
-                                class="size-4 rounded border-input"
-                            >
-                            Add an expiration
-                        </label>
-                        <div v-if="showExpiry" class="grid gap-2">
-                            <Label for="expires_at">Expiration date</Label>
+                        <div v-if="isCustomDomain" class="grid gap-2">
+                            <Label for="alias">Custom alias (optional)</Label>
                             <Input
-                                id="expires_at"
-                                name="expires_at"
-                                type="datetime-local"
+                                id="alias"
+                                name="alias"
+                                placeholder="launch"
+                                autocomplete="off"
                             />
-                            <InputError :message="errors.expires_at" />
+                            <InputError :message="errors.alias" />
                         </div>
-                        <p
-                            v-else-if="isGuest"
-                            class="text-xs text-muted-foreground"
-                        >
-                            Guest links expire after {{ guestTtlDays }} days by
-                            default.
-                        </p>
+
+                        <div class="grid gap-3">
+                            <label class="flex items-center gap-3 text-sm">
+                                <input
+                                    v-model="showPassword"
+                                    type="checkbox"
+                                    class="size-4 rounded border-input"
+                                >
+                                Add a password
+                            </label>
+                            <div v-if="showPassword" class="grid gap-2">
+                                <Label for="password">Password</Label>
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    autocomplete="new-password"
+                                />
+                                <InputError :message="errors.password" />
+                            </div>
+                        </div>
+
+                        <div class="grid gap-3">
+                            <label class="flex items-center gap-3 text-sm">
+                                <input
+                                    v-model="showExpiry"
+                                    type="checkbox"
+                                    class="size-4 rounded border-input"
+                                >
+                                Add an expiration
+                            </label>
+                            <div v-if="showExpiry" class="grid gap-2">
+                                <Label for="expires_at">Expiration date</Label>
+                                <Input
+                                    id="expires_at"
+                                    name="expires_at"
+                                    type="datetime-local"
+                                />
+                                <InputError :message="errors.expires_at" />
+                            </div>
+                            <p
+                                v-else-if="isGuest"
+                                class="text-xs text-muted-foreground"
+                            >
+                                Guest links expire after {{ guestTtlDays }} days by
+                                default.
+                            </p>
+                        </div>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
