@@ -11,12 +11,12 @@
 
 * [ ] 1. Authentication (Google OAuth)
 
-  * [ ] Install/configure Google OAuth provider
-  * [ ] Implement login flow (redirect to Google, callback handling, session login)
+  * [x] Install/configure Google OAuth provider
+  * [x] Implement login flow (redirect to Google, callback handling, session login)
   * [ ] Implement logout
-  * [ ] Create/update `users` table fields required for OAuth identity
+  * [x] Create/update `users` table fields required for OAuth identity
   * [ ] Create authenticated middleware-protected dashboard entry route
-  * [ ] Add UI: “Continue with Google” button and minimal auth landing page
+  * [x] Add UI: “Continue with Google” button and minimal auth landing page
   * [ ] Acceptance: user can sign in/out and access dashboard
 
 * [ ] 2. Data model (domains, links, optional guest tokens)
