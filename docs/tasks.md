@@ -1,12 +1,13 @@
-* [ ] 0. Project setup and baseline
+* [x] 0. Project setup and baseline
 
   * [x] Initialize Laravel 12 project and environment configuration (local + production-ready env structure)
-  * [ ] Configure MariaDB connection and run baseline migration
-  * [ ] Configure Inertia + Vue 3 integration and verify page rendering
-  * [ ] Configure TailwindCSS v4 and set up global layout styles
-  * [ ] Set up app layout shell (navigation, container, page header, flash/toast placeholder)
-  * [ ] Define route groups: dashboard (auth), public (redirect/create), domain verification (auth)
-  * [ ] Add basic error pages/views for 404 and expired/deleted states
+  * [x] Configure MariaDB connection and run baseline migration
+  * [x] Configure Inertia + Vue 3 integration and verify page rendering
+  * [x] Configure TailwindCSS v4 
+  * [x] Set up global layout styles
+  * [x] Set up app layout shell (navigation, container, page header, flash/toast placeholder)
+  * [x] Define route groups: dashboard (auth), public (redirect/create), domain verification (auth)
+  * [x] Add basic error pages/views for 404 and expired/deleted states
 
 * [ ] 1. Authentication (Google OAuth)
 
