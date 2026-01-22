@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\Domains\DomainController;
+use App\Http\Controllers\Links\LinkController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -13,9 +14,10 @@ Route::middleware('web')->group(function () {
         ]);
     })->name('home');
 
-    Route::get('/create', function () {
-        return Inertia::render('public/CreateLink');
-    })->name('links.create');
+    Route::get('/create', [LinkController::class, 'create'])->name('links.create');
+    Route::post('/links', [LinkController::class, 'store'])->name('links.store');
+    Route::get('/links/success/{token}', [LinkController::class, 'success'])
+        ->name('links.success');
 
     Route::get('/oauth/google', [GoogleOAuthController::class, 'redirect'])
         ->name('oauth.google.redirect');
