@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { create, destroy } from '@/routes/links';
-import { Head, Link } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 
 type LinkItem = {
     id: number;
@@ -50,29 +50,37 @@ defineProps<{
             <div
                 v-for="link in links.data"
                 :key="link.id"
-                class="rounded-2xl border border-border/70 bg-card p-6"
+                class="relative rounded-2xl border border-border/70 bg-card p-6"
             >
-                <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div class="space-y-2">
-                        <p class="text-xs font-semibold uppercase text-muted-foreground">
-                            Short link
-                        </p>
-                        <p class="text-lg font-semibold">{{ link.short_url }}</p>
-                        <p class="text-sm text-muted-foreground">
-                            {{ link.destination_url }}
-                        </p>
-                    </div>
-                    <div class="text-right text-sm text-muted-foreground">
-                        <p>{{ link.click_count }} clicks</p>
-                        <p v-if="link.last_accessed_at">
-                            Last accessed
-                            {{ new Date(link.last_accessed_at).toLocaleString() }}
-                        </p>
-                        <p v-else>No clicks yet</p>
+                <a
+                    :href="link.short_url"
+                    class="absolute inset-0 rounded-2xl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                ></a>
+                <div class="relative z-10 pointer-events-none">
+                    <div class="flex flex-wrap items-start justify-between gap-4">
+                        <div class="space-y-2">
+                            <p class="text-xs font-semibold uppercase text-muted-foreground">
+                                Short link
+                            </p>
+                            <p class="text-lg font-semibold">{{ link.short_url }}</p>
+                            <p class="text-sm text-muted-foreground">
+                                {{ link.destination_url }}
+                            </p>
+                        </div>
+                        <div class="text-right text-sm text-muted-foreground">
+                            <p>{{ link.click_count }} clicks</p>
+                            <p v-if="link.last_accessed_at">
+                                Last accessed
+                                {{ new Date(link.last_accessed_at).toLocaleString() }}
+                            </p>
+                            <p v-else>No clicks yet</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+                <div class="relative z-10 mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
                     <div class="text-muted-foreground">
                         <span v-if="link.expires_at">
                             Expires
@@ -80,11 +88,11 @@ defineProps<{
                         </span>
                         <span v-else>Never expires</span>
                     </div>
-                    <form v-bind="destroy(link.id)">
+                    <Form v-bind="destroy(link.id)" class="pointer-events-auto">
                         <Button type="submit" size="sm" variant="ghost">
                             Delete
                         </Button>
-                    </form>
+                    </Form>
                 </div>
             </div>
         </div>
