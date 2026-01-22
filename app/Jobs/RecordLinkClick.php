@@ -10,6 +10,8 @@ class RecordLinkClick implements ShouldQueue
 {
     use Queueable;
 
+    public int $tries = 1;
+
     /**
      * Create a new job instance.
      */

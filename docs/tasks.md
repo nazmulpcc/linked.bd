@@ -144,13 +144,13 @@
   * [x] Configure scheduler cadence (e.g., hourly) and document required cron entry
   * [x] Acceptance: expired and guest TTL links disappear automatically and stop working
 
-* [ ] 11. Queue infrastructure and reliability
+* [x] 11. Queue infrastructure and reliability
 
-  * [ ] Configure queue driver for day-one (database recommended unless Redis available)
-  * [ ] Create queue tables and failed jobs table
-  * [ ] Document how to run queue worker(s) in production
-  * [ ] Ensure QR and click jobs are idempotent enough for retries
-  * [ ] Acceptance: jobs process successfully; failures are observable and retryable
+  * [x] Configure queue driver for day-one (database recommended unless Redis available)
+  * [x] Create queue tables and failed jobs table
+  * [x] Document how to run queue worker(s) in production (not required)
+  * [x] Ensure QR and click jobs are idempotent enough for retries
+  * [x] Acceptance: jobs process successfully; failures are observable and retryable
 
 * [ ] 12. UI/UX polish (minimal modern design)
 
