@@ -48,9 +48,9 @@ const flashError = computed(() => page.props.flash?.error);
 
         <div class="flex flex-col gap-3">
             <Button as-child variant="secondary" class="w-full">
-                <Link :href="googleRedirect()">
+                <a :href="googleRedirect().url">
                     Continue with Google
-                </Link>
+                </a>
             </Button>
             <div class="flex items-center gap-4 text-xs text-muted-foreground">
                 <span class="h-px flex-1 bg-border"></span>
