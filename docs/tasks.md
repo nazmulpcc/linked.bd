@@ -172,14 +172,14 @@
   * [x] Ensure redirect route avoids heavy middleware and leaks no sensitive info
   * [x] Acceptance: obvious abuse vectors mitigated without adding complexity
 
-* [ ] 14. Final verification against acceptance criteria
+* [x] 14. Final verification against acceptance criteria
 
-  * [ ] Google sign-in works; dashboard accessible
-  * [ ] Custom domain add + DNS TXT verify works
-  * [ ] Platform link creation works (auto code only)
-  * [ ] Custom domain link creation works (custom alias)
-  * [ ] Password protection flow works end-to-end
-  * [ ] QR generated + downloadable
-  * [ ] Click count increments + last accessed updates
-  * [ ] Manual delete hard deletes and link stops working immediately
-  * [ ] Scheduled expiry/guest cleanup hard deletes and links stop working
+  * [x] Google sign-in works; dashboard accessible
+  * [x] Custom domain add + DNS TXT verify works
+  * [x] Platform link creation works (auto code only)
+  * [x] Custom domain link creation works (custom alias)
+  * [x] Password protection flow works end-to-end
+  * [x] QR generated + downloadable
+  * [x] Click count increments + last accessed updates
+  * [x] Manual delete hard deletes and link stops working immediately
+  * [x] Scheduled expiry/guest cleanup hard deletes and links stop working
