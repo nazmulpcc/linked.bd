@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleOAuthController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -14,6 +15,11 @@ Route::middleware('web')->group(function () {
     Route::get('/create', function () {
         return Inertia::render('public/CreateLink');
     })->name('links.create');
+
+    Route::get('/oauth/google', [GoogleOAuthController::class, 'redirect'])
+        ->name('oauth.google.redirect');
+    Route::get('/oauth/google/callback', [GoogleOAuthController::class, 'callback'])
+        ->name('oauth.google.callback');
 });
 
 Route::middleware(['auth', 'verified'])

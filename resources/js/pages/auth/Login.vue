@@ -1,22 +1,29 @@
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthBase from '@/layouts/AuthLayout.vue';
+import { redirect as googleRedirect } from '@/routes/oauth/google';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link, usePage } from '@inertiajs/vue3';
+import { AlertCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 defineProps<{
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
 }>();
+
+const page = usePage();
+const flashError = computed(() => page.props.flash?.error);
 </script>
 
 <template>
@@ -31,6 +38,25 @@ defineProps<{
             class="mb-4 text-center text-sm font-medium text-green-600"
         >
             {{ status }}
+        </div>
+
+        <Alert v-if="flashError" variant="destructive">
+            <AlertCircle class="size-4" />
+            <AlertTitle>Sign in failed</AlertTitle>
+            <AlertDescription>{{ flashError }}</AlertDescription>
+        </Alert>
+
+        <div class="flex flex-col gap-3">
+            <Button as-child variant="secondary" class="w-full">
+                <Link :href="googleRedirect()">
+                    Continue with Google
+                </Link>
+            </Button>
+            <div class="flex items-center gap-4 text-xs text-muted-foreground">
+                <span class="h-px flex-1 bg-border"></span>
+                Or sign in with email
+                <span class="h-px flex-1 bg-border"></span>
+            </div>
         </div>
 
         <Form
