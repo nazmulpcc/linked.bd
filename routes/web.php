@@ -18,7 +18,9 @@ Route::middleware('web')->group(function () {
     })->name('home');
 
     Route::get('/create', [LinkController::class, 'create'])->name('links.create');
-    Route::post('/links', [LinkController::class, 'store'])->name('links.store');
+    Route::post('/links', [LinkController::class, 'store'])
+        ->middleware('throttle:link-create')
+        ->name('links.store');
     Route::get('/links/success/{token}', [LinkController::class, 'success'])
         ->name('links.success');
 

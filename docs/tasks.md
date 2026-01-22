@@ -164,13 +164,13 @@
   * [x] Add dark mode support if time allows
   * [x] Acceptance: UI is consistent, minimal, and pleasant with clear states
 
-* [ ] 13. Validation, abuse controls, and security checks
+* [x] 13. Validation, abuse controls, and security checks
 
-  * [ ] Destination URL validation (block dangerous schemes; optional internal IP blocking)
-  * [ ] Rate limit guest link creation (per IP) if feasible day-one
-  * [ ] Ensure domain ownership enforced; prevent claiming domains already registered
-  * [ ] Ensure redirect route avoids heavy middleware and leaks no sensitive info
-  * [ ] Acceptance: obvious abuse vectors mitigated without adding complexity
+  * [x] Destination URL validation (block dangerous schemes; optional internal IP blocking)
+  * [x] Rate limit guest link creation (per IP) if feasible day-one
+  * [x] Ensure domain ownership enforced; prevent claiming domains already registered
+  * [x] Ensure redirect route avoids heavy middleware and leaks no sensitive info
+  * [x] Acceptance: obvious abuse vectors mitigated without adding complexity
 
 * [ ] 14. Final verification against acceptance criteria
 

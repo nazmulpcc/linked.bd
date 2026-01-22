@@ -4,6 +4,7 @@ namespace App\Http\Requests\Links;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreLinkRequest extends FormRequest
 {
@@ -70,5 +71,39 @@ class StoreLinkRequest extends FormRequest
             'password.min' => 'Passwords must be at least 6 characters.',
             'expires_at.after' => 'The expiration date must be in the future.',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $url = $this->string('destination_url')->toString();
+
+            if ($url === '') {
+                return;
+            }
+
+            $host = parse_url($url, PHP_URL_HOST);
+
+            if (! is_string($host) || $host === '') {
+                return;
+            }
+
+            if ($this->isBlockedIp($host)) {
+                $validator->errors()->add('destination_url', 'Destination URLs cannot target private or reserved IPs.');
+            }
+        });
+    }
+
+    private function isBlockedIp(string $host): bool
+    {
+        if (! filter_var($host, FILTER_VALIDATE_IP)) {
+            return false;
+        }
+
+        return ! filter_var(
+            $host,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE,
+        );
     }
 }

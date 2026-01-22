@@ -25,6 +25,32 @@ test('guests can create links on platform domains', function () {
         ->and($link->expires_at)->not->toBeNull();
 });
 
+test('destination urls cannot target private ips', function () {
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->post(route('links.store'), [
+        'destination_url' => 'http://127.0.0.1/admin',
+        'domain_id' => $domain->id,
+    ]);
+
+    $response->assertSessionHasErrors('destination_url');
+});
+
+test('guest link creation is rate limited', function () {
+    $domain = Domain::factory()->platform()->create();
+
+    $response = null;
+
+    for ($attempt = 0; $attempt < 11; $attempt++) {
+        $response = $this->post(route('links.store'), [
+            'destination_url' => 'https://example.com',
+            'domain_id' => $domain->id,
+        ]);
+    }
+
+    $response->assertStatus(429);
+});
+
 test('link creation queues qr generation', function () {
     Queue::fake();
 
