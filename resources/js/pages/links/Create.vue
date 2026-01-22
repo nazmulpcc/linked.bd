@@ -48,7 +48,7 @@ const selectClass =
             <section class="rounded-2xl border border-border/70 bg-card p-6">
                 <Form
                     v-if="domains.length"
-                    v-bind="store.form()"
+                    v-bind="store()"
                     v-slot="{ errors, processing }"
                     class="grid gap-6"
                 >
