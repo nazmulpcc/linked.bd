@@ -24,6 +24,18 @@ class Domain extends Model
     /** @use HasFactory<\Database\Factories\DomainFactory> */
     use HasFactory;
 
+    public const STATUS_PENDING = 'pending_verification';
+
+    public const STATUS_VERIFIED = 'verified';
+
+    public const STATUS_DISABLED = 'disabled';
+
+    public const TYPE_PLATFORM = 'platform';
+
+    public const TYPE_CUSTOM = 'custom';
+
+    public const VERIFICATION_DNS = 'dns_txt';
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -32,6 +44,11 @@ class Domain extends Model
     public function links(): HasMany
     {
         return $this->hasMany(Link::class);
+    }
+
+    public function verificationRecordName(): string
+    {
+        return sprintf('_shortlink.%s', $this->hostname);
     }
 
     protected function casts(): array

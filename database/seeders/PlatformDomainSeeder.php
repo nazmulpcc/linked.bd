@@ -28,8 +28,8 @@ class PlatformDomainSeeder extends Seeder
             ['hostname' => $host],
             [
                 'user_id' => null,
-                'type' => 'platform',
-                'status' => 'verified',
+                'type' => Domain::TYPE_PLATFORM,
+                'status' => Domain::STATUS_VERIFIED,
                 'verification_method' => null,
                 'verification_token' => null,
                 'verified_at' => now(),

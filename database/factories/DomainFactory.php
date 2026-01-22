@@ -19,9 +19,9 @@ class DomainFactory extends Factory
         return [
             'user_id' => null,
             'hostname' => fake()->unique()->domainName(),
-            'type' => 'custom',
-            'status' => 'pending_verification',
-            'verification_method' => 'dns_txt',
+            'type' => \App\Models\Domain::TYPE_CUSTOM,
+            'status' => \App\Models\Domain::STATUS_PENDING,
+            'verification_method' => \App\Models\Domain::VERIFICATION_DNS,
             'verification_token' => fake()->regexify('[A-Za-z0-9]{32}'),
             'verified_at' => null,
         ];
@@ -31,8 +31,8 @@ class DomainFactory extends Factory
     {
         return $this->state(fn () => [
             'user_id' => null,
-            'type' => 'platform',
-            'status' => 'verified',
+            'type' => \App\Models\Domain::TYPE_PLATFORM,
+            'status' => \App\Models\Domain::STATUS_VERIFIED,
             'verification_method' => null,
             'verification_token' => null,
             'verified_at' => now(),
@@ -42,7 +42,7 @@ class DomainFactory extends Factory
     public function verified(): static
     {
         return $this->state(fn () => [
-            'status' => 'verified',
+            'status' => \App\Models\Domain::STATUS_VERIFIED,
             'verified_at' => now(),
         ]);
     }

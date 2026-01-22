@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleOAuthController;
+use App\Http\Controllers\Domains\DomainController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -34,9 +35,11 @@ Route::middleware(['auth', 'verified'])
     ->prefix('domains')
     ->name('domains.')
     ->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('domains/Index');
-        })->name('index');
+        Route::get('/', [DomainController::class, 'index'])->name('index');
+        Route::post('/', [DomainController::class, 'store'])->name('store');
+        Route::post('/{domain}/verify', [DomainController::class, 'verify'])->name('verify');
+        Route::post('/{domain}/disable', [DomainController::class, 'disable'])->name('disable');
+        Route::delete('/{domain}', [DomainController::class, 'destroy'])->name('destroy');
     });
 
 require __DIR__.'/settings.php';
