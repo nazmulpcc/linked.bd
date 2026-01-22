@@ -1,47 +1,59 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard().url,
-    },
-];
 </script>
 
 <template>
     <Head title="Dashboard" />
 
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div
-            class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
-        >
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
+    <AppLayout
+        title="Dashboard"
+        description="Track your links and keep an eye on what is getting clicks."
+    >
+        <div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
+            <section class="rounded-2xl border border-border/70 bg-card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-muted-foreground">
+                            Recent activity
+                        </p>
+                        <p class="text-2xl font-semibold">0 clicks today</p>
+                    </div>
+                    <div
+                        class="rounded-full border border-border/70 bg-muted px-3 py-1 text-xs font-medium"
+                    >
+                        Live updates soon
+                    </div>
                 </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
+                <div class="mt-6 grid gap-3">
+                    <div
+                        class="rounded-xl border border-dashed border-border/70 px-4 py-6 text-sm text-muted-foreground"
+                    >
+                        Your latest links will show here. Create one to get
+                        started.
+                    </div>
                 </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
+            </section>
+
+            <aside class="rounded-2xl border border-border/70 bg-card p-6">
+                <p class="text-sm font-medium text-muted-foreground">
+                    Workspace snapshot
+                </p>
+                <div class="mt-4 grid gap-4 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span>Active links</span>
+                        <span class="font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Custom domains</span>
+                        <span class="font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Protected links</span>
+                        <span class="font-semibold">0</span>
+                    </div>
                 </div>
-            </div>
-            <div
-                class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
-            </div>
+            </aside>
         </div>
     </AppLayout>
 </template>
