@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Links;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Links\UnlockLinkRequest;
+use App\Jobs\RecordLinkClick;
 use App\Models\Domain;
 use App\Models\Link;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class RedirectController extends Controller
 {
@@ -36,6 +38,8 @@ class RedirectController extends Controller
         }
 
         if (! $link->password_hash) {
+            $this->recordClick($link);
+
             return redirect()->away($link->destination_url);
         }
 
@@ -69,6 +73,8 @@ class RedirectController extends Controller
         }
 
         if (! $link->password_hash) {
+            $this->recordClick($link);
+
             return Inertia::location($link->destination_url);
         }
 
@@ -93,6 +99,8 @@ class RedirectController extends Controller
         }
 
         RateLimiter::clear($key);
+
+        $this->recordClick($link);
 
         return Inertia::location($link->destination_url);
     }
@@ -129,5 +137,26 @@ class RedirectController extends Controller
             $request->host(),
             Str::lower($slug),
         );
+    }
+
+    private function recordClick(Link $link): void
+    {
+        try {
+            RecordLinkClick::dispatch($link->id);
+        } catch (Throwable $exception) {
+            $this->recordClickSync($link);
+        }
+    }
+
+    private function recordClickSync(Link $link): void
+    {
+        if ($link->expires_at && $link->expires_at->isPast()) {
+            return;
+        }
+
+        $link->increment('click_count');
+        $link->forceFill([
+            'last_accessed_at' => now(),
+        ])->save();
     }
 }

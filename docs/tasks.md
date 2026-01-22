@@ -109,19 +109,19 @@
   * [x] Add basic throttling for password attempts (per IP/slug) if feasible day-one
   * [x] Acceptance: protected links never redirect without correct password
 
-* [ ] 8. Click analytics (queue-first)
+* [x] 8. Click analytics (queue-first)
 
-  * [ ] Define analytics update behavior:
+  * [x] Define analytics update behavior:
 
-    * [ ] Increment click_count
-    * [ ] Update last_accessed_at
-  * [ ] Implement `RecordLinkClick` job and dispatch it on successful redirect
-  * [ ] Implement safe fallback to synchronous atomic DB update if queue not available
-  * [ ] Ensure analytics not recorded for:
+    * [x] Increment click_count
+    * [x] Update last_accessed_at
+  * [x] Implement `RecordLinkClick` job and dispatch it on successful redirect
+  * [x] Implement safe fallback to synchronous atomic DB update if queue not available
+  * [x] Ensure analytics not recorded for:
 
-    * [ ] expired/deleted
-    * [ ] failed password attempts
-  * [ ] Acceptance: clicks increment and last_accessed_at updates without slowing redirect
+    * [x] expired/deleted
+    * [x] failed password attempts
+  * [x] Acceptance: clicks increment and last_accessed_at updates without slowing redirect
 
 * [ ] 9. QR code generation and download
 

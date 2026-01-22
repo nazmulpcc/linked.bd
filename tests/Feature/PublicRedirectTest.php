@@ -17,6 +17,11 @@ test('platform domain links resolve by code', function () {
     $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
 
     $response->assertRedirect('https://example.com');
+
+    $link->refresh();
+
+    expect($link->click_count)->toBe(1)
+        ->and($link->last_accessed_at)->not->toBeNull();
 });
 
 test('custom domain links resolve by alias', function () {
@@ -64,6 +69,11 @@ test('expired links return gone', function () {
     $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
 
     $response->assertStatus(410);
+
+    $link->refresh();
+
+    expect($link->click_count)->toBe(0)
+        ->and($link->last_accessed_at)->toBeNull();
 });
 
 test('missing links return not found', function () {
@@ -110,6 +120,11 @@ test('password protected links redirect when unlocked', function () {
         ]);
 
     $response->assertRedirect('https://example.com');
+
+    $link = Link::query()->where('code', 'secure2')->firstOrFail();
+
+    expect($link->click_count)->toBe(1)
+        ->and($link->last_accessed_at)->not->toBeNull();
 });
 
 test('password protected links reject invalid passwords', function () {
@@ -128,4 +143,9 @@ test('password protected links reject invalid passwords', function () {
         ]);
 
     $response->assertSessionHasErrors('password');
+
+    $link = Link::query()->where('code', 'secure3')->firstOrFail();
+
+    expect($link->click_count)->toBe(0)
+        ->and($link->last_accessed_at)->toBeNull();
 });
