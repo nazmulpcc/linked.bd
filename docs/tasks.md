@@ -40,36 +40,36 @@
   * [x] Generate verification token/value and store it
   * [x] Build verification instructions UI (what TXT record to set, value to use)
   * [x] Implement “Verify now” action that checks DNS TXT and updates status to verified
-  * [ ] Block link creation on custom domains unless domain is verified
+  * [x] Block link creation on custom domains unless domain is verified
   * [x] Implement disable/remove domain actions (remove only if no links or handle policy)
-  * [ ] Acceptance: user can add a domain, verify via DNS TXT, then use it for links
+  * [x] Acceptance: user can add a domain, verify via DNS TXT, then use it for links
 
-* [ ] 4. Link creation (platform + custom domain rules)
+* [x] 4. Link creation (platform + custom domain rules)
 
-  * [ ] Build link creation UI (single-screen form)
+  * [x] Build link creation UI (single-screen form)
 
-    * [ ] Destination URL input + validation feedback
-    * [ ] Domain selector (platform domains + verified custom domains)
-    * [ ] Alias field shown only when custom domain selected
-    * [ ] Password toggle + password field
-    * [ ] Expiry toggle + expiry input (date/time or duration)
-  * [ ] Implement backend validation rules:
+    * [x] Destination URL input + validation feedback
+    * [x] Domain selector (platform domains + verified custom domains)
+    * [x] Alias field shown only when custom domain selected
+    * [x] Password toggle + password field
+    * [x] Expiry toggle + expiry input (date/time or duration)
+  * [x] Implement backend validation rules:
 
-    * [ ] Allow only http/https destination URLs; reject unsafe schemes
-    * [ ] Platform domain: alias must be empty; code auto-generated
-    * [ ] Custom domain: alias allowed (required if you choose); enforce allowed charset/length and uniqueness per domain
-  * [ ] Implement short code generation with collision retry
-  * [ ] Store password as secure hash (never plaintext)
-  * [ ] Store expiry in `expires_at` when provided
-  * [ ] Implement guest creation endpoint/page (no login required)
+    * [x] Allow only http/https destination URLs; reject unsafe schemes
+    * [x] Platform domain: alias must be empty; code auto-generated
+    * [x] Custom domain: alias allowed (required if you choose); enforce allowed charset/length and uniqueness per domain
+  * [x] Implement short code generation with collision retry
+  * [x] Store password as secure hash (never plaintext)
+  * [x] Store expiry in `expires_at` when provided
+  * [x] Implement guest creation endpoint/page (no login required)
 
-    * [ ] Guest links get an implicit expiry based on configurable TTL (created_at + N days) if no explicit expiry
-  * [ ] Post-create success page:
+    * [x] Guest links get an implicit expiry based on configurable TTL (created_at + N days) if no explicit expiry
+  * [x] Post-create success page:
 
-    * [ ] Display short URL with copy button
-    * [ ] Display link status (password on/off, expiry date)
-    * [ ] QR preview placeholder (shows “generating” until ready)
-  * [ ] Acceptance: platform links auto-code; custom domain links allow alias; guest links created successfully
+    * [x] Display short URL with copy button
+    * [x] Display link status (password on/off, expiry date)
+    * [x] QR preview placeholder (shows “generating” until ready)
+  * [x] Acceptance: platform links auto-code; custom domain links allow alias; guest links created successfully
 
 * [ ] 5. Link listing and management (dashboard)
 
