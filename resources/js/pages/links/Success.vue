@@ -86,7 +86,10 @@ const copyLink = async () => {
                         >
                         <p>Your QR code is ready to download.</p>
                     </div>
-                    <p v-else>Generating your QR code…</p>
+                    <div v-else class="flex flex-col items-center gap-3">
+                        <div class="h-40 w-40 animate-pulse rounded-lg border border-border/70 bg-muted"></div>
+                        <p>Generating your QR code…</p>
+                    </div>
                 </div>
                 <Button
                     v-if="qrReady && qrDownloadUrl"

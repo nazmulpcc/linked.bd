@@ -65,7 +65,7 @@ const recordName = (hostname: string) => `_shortlink.${hostname}`;
                     </div>
                     <div class="flex flex-wrap gap-3">
                         <Button type="submit" :disabled="processing">
-                            Add domain
+                            {{ processing ? 'Adding...' : 'Add domain' }}
                         </Button>
                     </div>
                 </Form>
@@ -118,8 +118,11 @@ const recordName = (hostname: string) => `_shortlink.${hostname}`;
                         <Form
                             v-if="domain.status === 'pending_verification'"
                             v-bind="verify(domain.id)"
+                            v-slot="{ processing }"
                         >
-                            <Button type="submit" size="sm">Verify now</Button>
+                            <Button type="submit" size="sm" :disabled="processing">
+                                {{ processing ? 'Verifying...' : 'Verify now' }}
+                            </Button>
                         </Form>
 
                         <Form

@@ -168,7 +168,7 @@ const selectClass =
 
                     <div class="flex flex-wrap gap-3">
                         <Button type="submit" :disabled="processing">
-                            Create link
+                            {{ processing ? 'Creating...' : 'Create link' }}
                         </Button>
                     </div>
                 </Form>

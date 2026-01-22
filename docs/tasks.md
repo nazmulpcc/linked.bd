@@ -152,17 +152,17 @@
   * [x] Ensure QR and click jobs are idempotent enough for retries
   * [x] Acceptance: jobs process successfully; failures are observable and retryable
 
-* [ ] 12. UI/UX polish (minimal modern design)
+* [x] 12. UI/UX polish (minimal modern design)
 
-  * [ ] Define friendly color palette + typography scale in Tailwind config
-  * [ ] Build reusable UI components:
+  * [x] Define friendly color palette + typography scale in Tailwind config
+  * [x] Build reusable UI components:
 
-    * [ ] Buttons, inputs, toggles, cards, badges, empty states
-    * [ ] Toast/flash messages for copy/create/delete/verify actions
-  * [ ] Ensure forms have clear validation states and helper text
-  * [ ] Add consistent loading states (domain verify, create link, QR generating)
-  * [ ] Add dark mode support if time allows
-  * [ ] Acceptance: UI is consistent, minimal, and pleasant with clear states
+    * [x] Buttons, inputs, toggles, cards, badges, empty states
+    * [x] Toast/flash messages for copy/create/delete/verify actions
+  * [x] Ensure forms have clear validation states and helper text
+  * [x] Add consistent loading states (domain verify, create link, QR generating)
+  * [x] Add dark mode support if time allows
+  * [x] Acceptance: UI is consistent, minimal, and pleasant with clear states
 
 * [ ] 13. Validation, abuse controls, and security checks
 

@@ -20,9 +20,9 @@ defineProps<Props>();
         <div class="flex-1 bg-background">
             <div class="relative">
                 <div
-                    class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-emerald-50/70 via-transparent to-transparent dark:from-emerald-500/10"
+                    class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-50/80 via-transparent to-transparent dark:from-emerald-500/10"
                 ></div>
-                <div class="relative mx-auto w-full max-w-6xl px-4 py-8">
+                <div class="relative mx-auto w-full max-w-6xl px-4 py-10 animate-in fade-in slide-in-from-bottom-2 duration-700">
                     <FlashMessages class="mb-6" />
                     <div
                         v-if="$slots.header || title"
