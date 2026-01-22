@@ -19,19 +19,19 @@
   * [x] Add UI: “Continue with Google” button and minimal auth landing page
   * [ ] Acceptance: user can sign in/out and access dashboard
 
-* [ ] 2. Data model (domains, links, optional guest tokens)
+* [x] 2. Data model (domains, links, optional guest tokens)
 
-  * [ ] Create `domains` table (hostname, type, status, verification metadata, user ownership for custom)
-  * [ ] Create `links` table (domain_id, user_id nullable, code, alias nullable, destination_url, password_hash nullable, expires_at nullable, click_count, last_accessed_at, qr reference)
-  * [ ] Add indexes/uniqueness constraints:
+  * [x] Create `domains` table (hostname, type, status, verification metadata, user ownership for custom)
+  * [x] Create `links` table (domain_id, user_id nullable, code, alias nullable, destination_url, password_hash nullable, expires_at nullable, click_count, last_accessed_at, qr reference)
+  * [x] Add indexes/uniqueness constraints:
 
-    * [ ] domains.hostname unique
-    * [ ] links (domain_id, code) indexed/unique as needed
-    * [ ] links (domain_id, alias) unique where alias not null
-    * [ ] expires_at indexed
-  * [ ] Add optional `link_access_tokens` table (only if implementing guest “manage link” token)
-  * [ ] Seed or ensure platform domain(s) exist (or configure platform domains list in config)
-  * [ ] Acceptance: migrations run cleanly; constraints match alias policy
+    * [x] domains.hostname unique
+    * [x] links (domain_id, code) indexed/unique as needed
+    * [x] links (domain_id, alias) unique where alias not null
+    * [x] expires_at indexed
+  * [x] Add optional `link_access_tokens` table (only if implementing guest “manage link” token)
+  * [x] Seed or ensure platform domain(s) exist (or configure platform domains list in config)
+  * [x] Acceptance: migrations run cleanly; constraints match alias policy
 
 * [ ] 3. Domain management (custom domains + verification)
 
