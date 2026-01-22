@@ -7,6 +7,7 @@ use App\Http\Requests\Links\DestroyLinkRequest;
 use App\Models\Link;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -52,6 +53,7 @@ class LinkManagementController extends Controller
             abort(404);
         }
 
+        $this->deleteQr($link);
         $link->delete();
 
         return to_route('links.index')->with('success', 'Link deleted.');
@@ -68,5 +70,14 @@ class LinkManagementController extends Controller
         $scheme = $appScheme ?: 'https';
 
         return sprintf('%s://%s/%s', $scheme, $link->domain->hostname, Str::lower($slug ?? ''));
+    }
+
+    private function deleteQr(Link $link): void
+    {
+        if (! $link->qr_path) {
+            return;
+        }
+
+        Storage::disk('qr_code')->delete($link->qr_path);
     }
 }

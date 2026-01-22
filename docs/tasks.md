@@ -135,14 +135,14 @@
   * [x] Update UI to show QR preview when ready and provide download action
   * [x] Acceptance: every link produces a downloadable QR; UI reflects “generating” then “ready”
 
-* [ ] 10. Scheduler: expiry + guest auto-deletion (hard delete)
+* [x] 10. Scheduler: expiry + guest auto-deletion (hard delete)
 
-  * [ ] Implement scheduled command/job to hard delete expired links
-  * [ ] Implement scheduled command/job to hard delete guest links past configured TTL
-  * [ ] Ensure QR assets removed when link is deleted/expired
-  * [ ] Add safety sweep to remove orphaned QR assets (optional)
-  * [ ] Configure scheduler cadence (e.g., hourly) and document required cron entry
-  * [ ] Acceptance: expired and guest TTL links disappear automatically and stop working
+  * [x] Implement scheduled command/job to hard delete expired links
+  * [x] Implement scheduled command/job to hard delete guest links past configured TTL
+  * [x] Ensure QR assets removed when link is deleted/expired
+  * [x] Add safety sweep to remove orphaned QR assets (optional)
+  * [x] Configure scheduler cadence (e.g., hourly) and document required cron entry
+  * [x] Acceptance: expired and guest TTL links disappear automatically and stop working
 
 * [ ] 11. Queue infrastructure and reliability
 
