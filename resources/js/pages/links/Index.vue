@@ -14,6 +14,8 @@ type LinkItem = {
     last_accessed_at: string | null;
     expires_at: string | null;
     is_expired: boolean;
+    qr_ready: boolean;
+    qr_download_url: string | null;
 };
 
 type LinksPage = {
@@ -88,11 +90,22 @@ defineProps<{
                         </span>
                         <span v-else>Never expires</span>
                     </div>
-                    <Form v-bind="destroy(link)" class="pointer-events-auto">
-                        <Button type="submit" size="sm" variant="ghost">
-                            Delete
+                    <div class="flex items-center gap-2">
+                        <Button
+                            v-if="link.qr_ready && link.qr_download_url"
+                            size="sm"
+                            variant="ghost"
+                            as-child
+                            class="pointer-events-auto"
+                        >
+                            <a :href="link.qr_download_url">Download QR</a>
                         </Button>
-                    </Form>
+                        <Form v-bind="destroy(link)" class="pointer-events-auto">
+                            <Button type="submit" size="sm" variant="ghost">
+                                Delete
+                            </Button>
+                        </Form>
+                    </div>
                 </div>
             </div>
         </div>

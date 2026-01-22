@@ -31,6 +31,13 @@ class LinkManagementController extends Controller
                     'last_accessed_at' => optional($link->last_accessed_at)->toIso8601String(),
                     'expires_at' => optional($link->expires_at)->toIso8601String(),
                     'is_expired' => $link->expires_at !== null && $link->expires_at->isPast(),
+                    'qr_ready' => $link->qr_path !== null,
+                    'qr_download_url' => $link->qr_path
+                        ? route('links.qr.download', [
+                            'link' => $link->id,
+                            'download' => 1,
+                        ])
+                        : null,
                 ];
             });
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\Domains\DomainController;
 use App\Http\Controllers\Links\LinkController;
 use App\Http\Controllers\Links\LinkManagementController;
+use App\Http\Controllers\Links\LinkQrController;
 use App\Http\Controllers\Links\RedirectController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -37,6 +38,8 @@ Route::middleware(['auth', 'verified'])
         Route::get('/links', [LinkManagementController::class, 'index'])->name('links.index');
         Route::delete('/links/{link}', [LinkManagementController::class, 'destroy'])
             ->name('links.destroy');
+        Route::get('/links/{link}/qr', [LinkQrController::class, 'download'])
+            ->name('links.qr.download');
     });
 
 Route::middleware(['auth', 'verified'])
@@ -58,3 +61,7 @@ Route::middleware('web')
 Route::middleware('web')
     ->post('/{slug}', [RedirectController::class, 'unlock'])
     ->name('links.unlock');
+
+Route::middleware('web')
+    ->get('/links/qr/{token}', [LinkQrController::class, 'downloadGuest'])
+    ->name('links.qr.guest');

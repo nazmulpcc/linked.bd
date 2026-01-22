@@ -10,6 +10,8 @@ type Props = {
     expiresAt: string | null;
     passwordProtected: boolean;
     qrReady: boolean;
+    qrPreviewUrl: string | null;
+    qrDownloadUrl: string | null;
 };
 
 const props = defineProps<Props>();
@@ -76,10 +78,27 @@ const copyLink = async () => {
             <aside class="rounded-2xl border border-border/70 bg-card p-6">
                 <p class="text-sm font-semibold">QR code</p>
                 <div class="mt-4 rounded-xl border border-dashed border-border/70 p-4 text-sm text-muted-foreground">
-                    <p v-if="qrReady">Your QR code is ready to download.</p>
+                    <div v-if="qrReady && qrPreviewUrl" class="flex flex-col items-center gap-3">
+                        <img
+                            :src="qrPreviewUrl"
+                            alt="QR code"
+                            class="h-40 w-40 rounded-lg border border-border/70 bg-white p-2"
+                        >
+                        <p>Your QR code is ready to download.</p>
+                    </div>
                     <p v-else>Generating your QR code…</p>
                 </div>
                 <Button
+                    v-if="qrReady && qrDownloadUrl"
+                    class="mt-4"
+                    size="sm"
+                    variant="secondary"
+                    as-child
+                >
+                    <a :href="qrDownloadUrl">Download QR</a>
+                </Button>
+                <Button
+                    v-else
                     class="mt-4"
                     size="sm"
                     variant="secondary"

@@ -123,17 +123,17 @@
     * [x] failed password attempts
   * [x] Acceptance: clicks increment and last_accessed_at updates without slowing redirect
 
-* [ ] 9. QR code generation and download
+* [x] 9. QR code generation and download
 
-  * [ ] Choose QR output format (PNG or SVG) and storage target (local/S3-configurable)
-  * [ ] Implement `GenerateQrForLink` job dispatched after link creation
-  * [ ] Store QR reference/path on link record
-  * [ ] Implement QR retrieval endpoint:
+  * [x] Choose QR output format (PNG or SVG) and storage target (local/S3-configurable)
+  * [x] Implement `GenerateQrForLink` job dispatched after link creation
+  * [x] Store QR reference/path on link record
+  * [x] Implement QR retrieval endpoint:
 
-    * [ ] Authenticated owners can download their QR
-    * [ ] Guest-created links: allow download from success page (use signed URL/token if needed)
-  * [ ] Update UI to show QR preview when ready and provide download action
-  * [ ] Acceptance: every link produces a downloadable QR; UI reflects “generating” then “ready”
+    * [x] Authenticated owners can download their QR
+    * [x] Guest-created links: allow download from success page (use signed URL/token if needed)
+  * [x] Update UI to show QR preview when ready and provide download action
+  * [x] Acceptance: every link produces a downloadable QR; UI reflects “generating” then “ready”
 
 * [ ] 10. Scheduler: expiry + guest auto-deletion (hard delete)
 

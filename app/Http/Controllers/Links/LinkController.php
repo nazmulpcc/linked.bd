@@ -111,6 +111,15 @@ class LinkController extends Controller
             'expiresAt' => optional($link->expires_at)->toIso8601String(),
             'passwordProtected' => $link->password_hash !== null,
             'qrReady' => $link->qr_path !== null,
+            'qrPreviewUrl' => $link->qr_path
+                ? route('links.qr.guest', ['token' => $accessToken->token])
+                : null,
+            'qrDownloadUrl' => $link->qr_path
+                ? route('links.qr.guest', [
+                    'token' => $accessToken->token,
+                    'download' => 1,
+                ])
+                : null,
         ]);
     }
 

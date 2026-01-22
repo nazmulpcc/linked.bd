@@ -1,9 +1,11 @@
 <?php
 
+use App\Jobs\GenerateQrForLink;
 use App\Models\Domain;
 use App\Models\Link;
 use App\Models\LinkAccessToken;
 use App\Models\User;
+use Illuminate\Support\Facades\Queue;
 
 test('guests can create links on platform domains', function () {
     $domain = Domain::factory()->platform()->create();
@@ -21,6 +23,21 @@ test('guests can create links on platform domains', function () {
         ->not->toBeNull()
         ->and($link->user_id)->toBeNull()
         ->and($link->expires_at)->not->toBeNull();
+});
+
+test('link creation queues qr generation', function () {
+    Queue::fake();
+
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->post(route('links.store'), [
+        'destination_url' => 'https://example.com',
+        'domain_id' => $domain->id,
+    ]);
+
+    $response->assertRedirectContains('/links/success/');
+
+    Queue::assertPushed(GenerateQrForLink::class);
 });
 
 test('password is optional when creating links', function () {
