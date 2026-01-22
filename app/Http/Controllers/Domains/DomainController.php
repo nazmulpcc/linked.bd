@@ -57,8 +57,8 @@ class DomainController extends Controller
     public function verify(
         VerifyDomainRequest $request,
         Domain $domain,
-        VerifyDomain $verifier,
     ): RedirectResponse {
+        $verifier = app(VerifyDomain::class);
         $domain = $this->resolveDomainForUser($request, $domain);
 
         if ($domain->status === Domain::STATUS_DISABLED) {
