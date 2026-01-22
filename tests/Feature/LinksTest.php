@@ -23,6 +23,18 @@ test('guests can create links on platform domains', function () {
         ->and($link->expires_at)->not->toBeNull();
 });
 
+test('password is optional when creating links', function () {
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->post(route('links.store'), [
+        'destination_url' => 'https://example.com',
+        'domain_id' => $domain->id,
+        'password' => '',
+    ]);
+
+    $response->assertRedirectContains('/links/success/');
+});
+
 test('authenticated users can create custom domain links with aliases', function () {
     $user = User::factory()->create();
     $domain = Domain::factory()->for($user)->verified()->create();

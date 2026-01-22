@@ -19,7 +19,7 @@ defineProps<{
         description="Enter the password to continue."
     >
         <Form
-            v-bind="unlock(slug)"
+            v-bind="unlock.form(slug)"
             class="flex flex-col gap-4"
             #default="{ errors, processing }"
         >

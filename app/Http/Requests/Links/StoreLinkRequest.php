@@ -44,6 +44,7 @@ class StoreLinkRequest extends FormRequest
             ],
             'password' => [
                 'nullable',
+                Rule::excludeIf($this->input('password') === ''),
                 'string',
                 'min:6',
                 'max:255',
