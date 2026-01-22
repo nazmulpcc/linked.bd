@@ -80,7 +80,7 @@ defineProps<{
                         </span>
                         <span v-else>Never expires</span>
                     </div>
-                    <form v-bind="destroy.form(link.id)">
+                    <form v-bind="destroy(link.id)">
                         <Button type="submit" size="sm" variant="ghost">
                             Delete
                         </Button>
