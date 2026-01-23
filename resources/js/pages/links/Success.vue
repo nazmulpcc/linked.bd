@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 type Props = {
     shortUrl: string;
@@ -10,12 +10,18 @@ type Props = {
     expiresAt: string | null;
     passwordProtected: boolean;
     qrReady: boolean;
+    qrChannel: string | null;
     qrPreviewUrl: string | null;
     qrDownloadUrl: string | null;
 };
 
 const props = defineProps<Props>();
 const copied = ref(false);
+const qrReadyState = ref(props.qrReady);
+const qrPreviewState = ref(props.qrPreviewUrl);
+const qrDownloadState = ref(props.qrDownloadUrl);
+
+const channelName = props.qrChannel;
 
 const expiresLabel = computed(() =>
     props.expiresAt ? new Date(props.expiresAt).toLocaleString() : 'Never',
@@ -32,6 +38,25 @@ const copyLink = async () => {
         copied.value = false;
     }, 1500);
 };
+
+onMounted(() => {
+    if (!channelName || qrReadyState.value || !window.Echo) {
+        return;
+    }
+
+    window.Echo.channel(channelName)
+        .listen('.link.qr.generated', (event: { previewUrl: string; downloadUrl: string }) => {
+            qrReadyState.value = true;
+            qrPreviewState.value = event.previewUrl;
+            qrDownloadState.value = event.downloadUrl;
+        });
+});
+
+onBeforeUnmount(() => {
+    if (channelName && window.Echo) {
+        window.Echo.leave(channelName);
+    }
+});
 </script>
 
 <template>
@@ -78,9 +103,9 @@ const copyLink = async () => {
             <aside class="rounded-2xl border border-border/70 bg-card p-6">
                 <p class="text-sm font-semibold">QR code</p>
                 <div class="mt-4 rounded-xl border border-dashed border-border/70 p-4 text-sm text-muted-foreground">
-                    <div v-if="qrReady && qrPreviewUrl" class="flex flex-col items-center gap-3">
+                    <div v-if="qrReadyState && qrPreviewState" class="flex flex-col items-center gap-3">
                         <img
-                            :src="qrPreviewUrl"
+                            :src="qrPreviewState"
                             alt="QR code"
                             class="h-40 w-40 rounded-lg border border-border/70 bg-white p-2"
                         >
@@ -92,13 +117,13 @@ const copyLink = async () => {
                     </div>
                 </div>
                 <Button
-                    v-if="qrReady && qrDownloadUrl"
+                    v-if="qrReadyState && qrDownloadState"
                     class="mt-4"
                     size="sm"
                     variant="secondary"
                     as-child
                 >
-                    <a :href="qrDownloadUrl">Download QR</a>
+                    <a :href="qrDownloadState">Download QR</a>
                 </Button>
                 <Button
                     v-else

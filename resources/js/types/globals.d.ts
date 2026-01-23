@@ -24,3 +24,10 @@ declare module 'vue' {
         $headManager: ReturnType<typeof createHeadManager>;
     }
 }
+
+declare global {
+    interface Window {
+        Echo: import('laravel-echo').default;
+        Pusher: typeof import('pusher-js');
+    }
+}

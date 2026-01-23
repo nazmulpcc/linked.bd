@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Events\LinkQrGenerated;
 use App\Models\Link;
+use App\Models\LinkAccessToken;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,6 +52,24 @@ class GenerateQrForLink implements ShouldQueue
         $link->forceFill([
             'qr_path' => $path,
         ])->save();
+
+        $token = LinkAccessToken::query()
+            ->where('link_id', $link->id)
+            ->latest()
+            ->value('token');
+
+        if (! $token) {
+            return;
+        }
+
+        if ($link->wasChanged('qr_path') === false) {
+            return;
+        }
+
+        event(new LinkQrGenerated($token, [
+            'previewUrl' => route('links.qr.guest', ['token' => $token]),
+            'downloadUrl' => route('links.qr.guest', ['token' => $token, 'download' => 1]),
+        ]));
     }
 
     private function shortUrl(Link $link): string

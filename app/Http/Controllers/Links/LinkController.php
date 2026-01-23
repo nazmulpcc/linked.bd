@@ -111,6 +111,7 @@ class LinkController extends Controller
             'expiresAt' => optional($link->expires_at)->toIso8601String(),
             'passwordProtected' => $link->password_hash !== null,
             'qrReady' => $link->qr_path !== null,
+            'qrChannel' => sprintf('link-qr.%s', $accessToken->token),
             'qrPreviewUrl' => $link->qr_path
                 ? route('links.qr.guest', ['token' => $accessToken->token])
                 : null,

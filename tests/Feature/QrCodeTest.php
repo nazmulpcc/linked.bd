@@ -1,10 +1,12 @@
 <?php
 
+use App\Events\LinkQrGenerated;
 use App\Jobs\GenerateQrForLink;
 use App\Models\Domain;
 use App\Models\Link;
 use App\Models\LinkAccessToken;
 use App\Models\User;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
@@ -29,6 +31,23 @@ test('qr job stores an svg and updates the link', function () {
     expect($link->qr_path)->not->toBeNull();
 
     Storage::disk('qr_code')->assertExists($link->qr_path);
+});
+
+test('qr job broadcasts when a token exists', function () {
+    Event::fake([LinkQrGenerated::class]);
+
+    $domain = Domain::factory()->platform()->create([
+        'hostname' => 'qr.example.test',
+    ]);
+    $link = Link::factory()->for($domain)->create([
+        'code' => 'qrtest-broadcast',
+        'qr_path' => null,
+    ]);
+    $token = LinkAccessToken::factory()->for($link)->create();
+
+    GenerateQrForLink::dispatchSync($link->id);
+
+    Event::assertDispatched(LinkQrGenerated::class, fn (LinkQrGenerated $event) => $event->token === $token->token);
 });
 
 test('guests can download their qr code using access tokens', function () {
