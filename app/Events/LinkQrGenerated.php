@@ -13,7 +13,7 @@ class LinkQrGenerated implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @param  array{previewUrl: string, downloadUrl: string}  $payload
+     * @param  array{previewUrl: string, downloadUrl: string, pngDownloadUrl: string}  $payload
      */
     public function __construct(
         public string $token,
@@ -41,7 +41,7 @@ class LinkQrGenerated implements ShouldBroadcastNow
     }
 
     /**
-     * @return array{previewUrl: string, downloadUrl: string}
+     * @return array{previewUrl: string, downloadUrl: string, pngDownloadUrl: string}
      */
     public function broadcastWith(): array
     {

@@ -68,6 +68,28 @@ test('guests can download their qr code using access tokens', function () {
     $response->assertHeader('Content-Type', 'image/svg+xml');
 });
 
+test('guests can download qr code as png', function () {
+    $domain = Domain::factory()->platform()->create([
+        'hostname' => 'qr.example.test',
+    ]);
+    $link = Link::factory()->for($domain)->create([
+        'code' => 'qrtest4',
+        'qr_path' => 'links/qrtest4.svg',
+    ]);
+    $token = LinkAccessToken::factory()->for($link)->create();
+
+    Storage::disk('qr_code')->put($link->qr_path, '<svg></svg>');
+
+    $response = $this->get(route('links.qr.guest', [
+        'token' => $token->token,
+        'format' => 'png',
+        'w' => 1024,
+    ]));
+
+    $response->assertOk();
+    $response->assertHeader('Content-Type', 'image/png');
+});
+
 test('authenticated owners can download qr codes', function () {
     $user = User::factory()->create();
     $domain = Domain::factory()->for($user)->verified()->create([

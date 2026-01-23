@@ -13,6 +13,7 @@ type Props = {
     qrChannel: string | null;
     qrPreviewUrl: string | null;
     qrDownloadUrl: string | null;
+    qrPngDownloadUrl: string | null;
 };
 
 const props = defineProps<Props>();
@@ -20,6 +21,7 @@ const copied = ref(false);
 const qrReadyState = ref(props.qrReady);
 const qrPreviewState = ref(props.qrPreviewUrl);
 const qrDownloadState = ref(props.qrDownloadUrl);
+const qrPngDownloadState = ref(props.qrPngDownloadUrl);
 
 const channelName = props.qrChannel;
 
@@ -45,10 +47,13 @@ onMounted(() => {
     }
 
     window.Echo.channel(channelName)
-        .listen('.link.qr.generated', (event: { previewUrl: string; downloadUrl: string }) => {
+        .listen(
+            '.link.qr.generated',
+            (event: { previewUrl: string; downloadUrl: string; pngDownloadUrl: string }) => {
             qrReadyState.value = true;
             qrPreviewState.value = event.previewUrl;
             qrDownloadState.value = event.downloadUrl;
+            qrPngDownloadState.value = event.pngDownloadUrl;
         });
 });
 
@@ -116,24 +121,32 @@ onBeforeUnmount(() => {
                         <p>Generating your QR code…</p>
                     </div>
                 </div>
-                <Button
-                    v-if="qrReadyState && qrDownloadState"
-                    class="mt-4"
-                    size="sm"
-                    variant="secondary"
-                    as-child
-                >
-                    <a :href="qrDownloadState">Download QR</a>
-                </Button>
-                <Button
-                    v-else
-                    class="mt-4"
-                    size="sm"
-                    variant="secondary"
-                    disabled
-                >
-                    Download QR
-                </Button>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <Button
+                        v-if="qrReadyState && qrDownloadState"
+                        size="sm"
+                        variant="secondary"
+                        as-child
+                    >
+                        <a :href="qrDownloadState">Download SVG</a>
+                    </Button>
+                    <Button
+                        v-if="qrReadyState && qrPngDownloadState"
+                        size="sm"
+                        variant="outline"
+                        as-child
+                    >
+                        <a :href="qrPngDownloadState">Download PNG</a>
+                    </Button>
+                    <Button
+                        v-else
+                        size="sm"
+                        variant="secondary"
+                        disabled
+                    >
+                        Download QR
+                    </Button>
+                </div>
             </aside>
         </div>
     </AppLayout>

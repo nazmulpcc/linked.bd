@@ -121,6 +121,14 @@ class LinkController extends Controller
                     'download' => 1,
                 ])
                 : null,
+            'qrPngDownloadUrl' => $link->qr_path
+                ? route('links.qr.guest', [
+                    'token' => $accessToken->token,
+                    'download' => 1,
+                    'format' => 'png',
+                    'w' => 1024,
+                ])
+                : null,
         ]);
     }
 

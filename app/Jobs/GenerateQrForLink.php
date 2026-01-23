@@ -53,6 +53,10 @@ class GenerateQrForLink implements ShouldQueue
             'qr_path' => $path,
         ])->save();
 
+        if ($link->wasChanged('qr_path') === false) {
+            return;
+        }
+
         $token = LinkAccessToken::query()
             ->where('link_id', $link->id)
             ->latest()
@@ -62,13 +66,15 @@ class GenerateQrForLink implements ShouldQueue
             return;
         }
 
-        if ($link->wasChanged('qr_path') === false) {
-            return;
-        }
-
         event(new LinkQrGenerated($token, [
             'previewUrl' => route('links.qr.guest', ['token' => $token]),
             'downloadUrl' => route('links.qr.guest', ['token' => $token, 'download' => 1]),
+            'pngDownloadUrl' => route('links.qr.guest', [
+                'token' => $token,
+                'download' => 1,
+                'format' => 'png',
+                'w' => 1024,
+            ]),
         ]));
     }
 
