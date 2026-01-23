@@ -160,14 +160,14 @@ class LinkController extends Controller
 
     private function resolveExpiry(StoreLinkRequest $request): ?\Carbon\CarbonInterface
     {
+        if (! $request->user()) {
+            return now()->addDays(config('links.guest_ttl_days'));
+        }
+
         $expiresInput = $request->input('expires_at');
 
         if (is_string($expiresInput) && $expiresInput !== '') {
             return Date::parse($expiresInput);
-        }
-
-        if (! $request->user()) {
-            return now()->addDays(config('links.guest_ttl_days'));
         }
 
         return null;

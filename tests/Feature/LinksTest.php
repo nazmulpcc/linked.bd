@@ -5,6 +5,7 @@ use App\Models\Domain;
 use App\Models\Link;
 use App\Models\LinkAccessToken;
 use App\Models\User;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Queue;
 
 test('guests can create links on platform domains', function () {
@@ -23,6 +24,29 @@ test('guests can create links on platform domains', function () {
         ->not->toBeNull()
         ->and($link->user_id)->toBeNull()
         ->and($link->expires_at)->not->toBeNull();
+});
+
+test('guest expiry always defaults to ttl', function () {
+    $now = now();
+    Date::setTestNow($now);
+    $overrideExpiry = $now->addDays(30);
+    $expectedExpiry = $now->addDays(config('links.guest_ttl_days'));
+
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->post(route('links.store'), [
+        'destination_url' => 'https://example.com',
+        'domain_id' => $domain->id,
+        'expires_at' => $overrideExpiry->toDateTimeString(),
+    ]);
+
+    $response->assertRedirectContains('/links/success/');
+
+    $link = Link::query()->firstOrFail();
+
+    expect($link->expires_at->diffInSeconds($expectedExpiry))->toBeLessThanOrEqual(1);
+
+    Date::setTestNow();
 });
 
 test('destination urls cannot target private ips', function () {

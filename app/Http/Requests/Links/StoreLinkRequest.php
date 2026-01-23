@@ -51,6 +51,7 @@ class StoreLinkRequest extends FormRequest
             ],
             'expires_at' => [
                 'nullable',
+                Rule::excludeIf($this->user() === null),
                 'date',
                 'after:now',
             ],

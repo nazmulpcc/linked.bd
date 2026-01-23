@@ -32,6 +32,7 @@ const selectedDomain = computed(() =>
 );
 
 const isCustomDomain = computed(() => selectedDomain.value?.type === 'custom');
+const hasSingleDomain = computed(() => props.domains.length === 1);
 
 const selectClass =
     'border-input text-foreground dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm';
@@ -80,11 +81,24 @@ const selectClass =
                         >
                             {{ showAdvanced ? 'Hide' : 'Show' }} advanced settings
                         </Button>
+                        <p
+                            v-if="hasSingleDomain"
+                            class="text-xs text-muted-foreground"
+                        >
+                            <span v-if="isGuest">
+                                Only one domain is available. Sign in to add more
+                                domains and customize this.
+                            </span>
+                            <span v-else>
+                                Only one domain is available. Add more domains if
+                                you want to customize this.
+                            </span>
+                        </p>
                         <InputError :message="errors.domain_id" />
                     </div>
 
                     <div v-if="showAdvanced" class="grid gap-6">
-                        <div class="grid gap-2">
+                        <div v-if="!hasSingleDomain" class="grid gap-2">
                             <Label for="domain_id">Domain</Label>
                             <select
                                 id="domain_id"
@@ -138,7 +152,7 @@ const selectClass =
                             </div>
                         </div>
 
-                        <div class="grid gap-3">
+                        <div v-if="!isGuest" class="grid gap-3">
                             <label class="flex items-center gap-3 text-sm">
                                 <input
                                     v-model="showExpiry"
@@ -156,15 +170,16 @@ const selectClass =
                                 />
                                 <InputError :message="errors.expires_at" />
                             </div>
-                            <p
-                                v-else-if="isGuest"
-                                class="text-xs text-muted-foreground"
-                            >
-                                Guest links expire after {{ guestTtlDays }} days by
-                                default.
-                            </p>
                         </div>
                     </div>
+
+                    <p
+                        v-if="isGuest"
+                        class="text-xs text-muted-foreground"
+                    >
+                        Guest links expire after {{ guestTtlDays }} days by
+                        default.
+                    </p>
 
                     <div class="flex flex-wrap gap-3">
                         <Button type="submit" :disabled="processing">
