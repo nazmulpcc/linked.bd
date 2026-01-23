@@ -22,6 +22,7 @@ class LinkFactory extends Factory
         return [
             'domain_id' => Domain::factory()->platform(),
             'user_id' => User::factory(),
+            'ulid' => (string) Str::ulid(),
             'code' => Str::lower(Str::random(7)),
             'alias' => null,
             'destination_url' => fake()->url(),

@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
+ * @property string|null $ulid
  * @property int $domain_id
  * @property int|null $user_id
  * @property string|null $code
@@ -45,6 +47,20 @@ class Link extends Model
     public function visits(): HasMany
     {
         return $this->hasMany(LinkVisit::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $link) {
+            if (! $link->ulid) {
+                $link->ulid = (string) Str::ulid();
+            }
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
     }
 
     protected function casts(): array

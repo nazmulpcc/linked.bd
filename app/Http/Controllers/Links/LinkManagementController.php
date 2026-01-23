@@ -25,6 +25,7 @@ class LinkManagementController extends Controller
             ->through(function (Link $link) {
                 return [
                     'id' => $link->id,
+                    'ulid' => $link->ulid,
                     'domain' => $link->domain?->hostname,
                     'short_path' => $link->alias ?? $link->code,
                     'short_url' => $this->shortUrl($link),
@@ -36,7 +37,7 @@ class LinkManagementController extends Controller
                     'qr_ready' => $link->qr_path !== null,
                     'qr_download_url' => $link->qr_path
                         ? route('links.qr.download', [
-                            'link' => $link->id,
+                            'link' => $link->ulid,
                             'download' => 1,
                         ])
                         : null,
@@ -118,6 +119,7 @@ class LinkManagementController extends Controller
         return Inertia::render('links/Show', [
             'link' => [
                 'id' => $link->id,
+                'ulid' => $link->ulid,
                 'short_url' => $this->shortUrl($link),
                 'destination_url' => $link->destination_url,
                 'click_count' => $link->click_count,

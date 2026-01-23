@@ -102,7 +102,7 @@ test('authenticated owners can download qr codes', function () {
 
     Storage::disk('qr_code')->put($link->qr_path, '<svg></svg>');
 
-    $response = actingAs($user)->get(route('links.qr.download', ['link' => $link->id]));
+    $response = actingAs($user)->get(route('links.qr.download', $link));
 
     $response->assertOk();
     $response->assertHeader('Content-Type', 'image/svg+xml');

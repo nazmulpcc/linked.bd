@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleOAuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Domains\DomainController;
 use App\Http\Controllers\Links\LinkController;
 use App\Http\Controllers\Links\LinkManagementController;
@@ -33,16 +34,14 @@ Route::middleware('web')->group(function () {
 Route::middleware(['auth', 'verified'])
     ->prefix('dashboard')
     ->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Dashboard');
-        })->name('dashboard');
+        Route::get('/', DashboardController::class)->name('dashboard');
 
         Route::get('/links', [LinkManagementController::class, 'index'])->name('links.index');
-        Route::get('/links/{link}', [LinkManagementController::class, 'show'])
+        Route::get('/links/{link:ulid}', [LinkManagementController::class, 'show'])
             ->name('links.show');
-        Route::delete('/links/{link}', [LinkManagementController::class, 'destroy'])
+        Route::delete('/links/{link:ulid}', [LinkManagementController::class, 'destroy'])
             ->name('links.destroy');
-        Route::get('/links/{link}/qr', [LinkQrController::class, 'download'])
+        Route::get('/links/{link:ulid}/qr', [LinkQrController::class, 'download'])
             ->name('links.qr.download');
     });
 

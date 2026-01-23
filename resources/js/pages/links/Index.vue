@@ -6,6 +6,7 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 
 type LinkItem = {
     id: number;
+    ulid: string;
     domain: string | null;
     short_path: string | null;
     short_url: string;
@@ -92,7 +93,7 @@ defineProps<{
                     </div>
                     <div class="flex items-center gap-2">
                         <Button size="sm" variant="ghost" as-child class="pointer-events-auto">
-                            <Link :href="show(link.id)">View analytics</Link>
+                            <Link :href="show(link.ulid)">View analytics</Link>
                         </Button>
                         <Button
                             v-if="link.qr_ready && link.qr_download_url"
@@ -103,7 +104,7 @@ defineProps<{
                         >
                             <a :href="link.qr_download_url">Download QR</a>
                         </Button>
-                        <Form v-bind="destroy.form(link)" class="pointer-events-auto">
+                        <Form v-bind="destroy.form(link.ulid)" class="pointer-events-auto">
                             <Button type="submit" size="sm" variant="ghost">
                                 Delete
                             </Button>
