@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Link;
+use App\Models\LinkVisit;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -13,9 +14,12 @@ class RecordLinkClick implements ShouldQueue
     public int $tries = 1;
 
     /**
-     * Create a new job instance.
+     * @param  array{visited_at: string, referrer_host: string|null, device_type: string|null, browser: string|null, country_code: string|null, user_agent: string|null}  $visitData
      */
-    public function __construct(public int $linkId) {}
+    public function __construct(
+        public int $linkId,
+        public array $visitData,
+    ) {}
 
     /**
      * Execute the job.
@@ -36,5 +40,20 @@ class RecordLinkClick implements ShouldQueue
         $link->forceFill([
             'last_accessed_at' => now(),
         ])->save();
+
+        $this->storeVisit($link);
+    }
+
+    private function storeVisit(Link $link): void
+    {
+        LinkVisit::query()->create([
+            'link_id' => $link->id,
+            'visited_at' => $this->visitData['visited_at'],
+            'referrer_host' => $this->visitData['referrer_host'],
+            'device_type' => $this->visitData['device_type'],
+            'browser' => $this->visitData['browser'],
+            'country_code' => $this->visitData['country_code'],
+            'user_agent' => $this->visitData['user_agent'],
+        ]);
     }
 }

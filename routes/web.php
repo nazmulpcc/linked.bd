@@ -38,6 +38,8 @@ Route::middleware(['auth', 'verified'])
         })->name('dashboard');
 
         Route::get('/links', [LinkManagementController::class, 'index'])->name('links.index');
+        Route::get('/links/{link}', [LinkManagementController::class, 'show'])
+            ->name('links.show');
         Route::delete('/links/{link}', [LinkManagementController::class, 'destroy'])
             ->name('links.destroy');
         Route::get('/links/{link}/qr', [LinkQrController::class, 'download'])

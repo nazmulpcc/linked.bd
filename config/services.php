@@ -39,4 +39,6 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
     ],
+
+    'ip_country_db_path' => env('IP_COUNTRY_DB_PATH'),
 ];

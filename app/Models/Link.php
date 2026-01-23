@@ -42,6 +42,11 @@ class Link extends Model
         return $this->hasMany(LinkAccessToken::class);
     }
 
+    public function visits(): HasMany
+    {
+        return $this->hasMany(LinkVisit::class);
+    }
+
     protected function casts(): array
     {
         return [

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { create, destroy } from '@/routes/links';
+import { create, destroy, show } from '@/routes/links';
 import { Form, Head, Link } from '@inertiajs/vue3';
 
 type LinkItem = {
@@ -91,6 +91,9 @@ defineProps<{
                         <span v-else>Never expires</span>
                     </div>
                     <div class="flex items-center gap-2">
+                        <Button size="sm" variant="ghost" as-child class="pointer-events-auto">
+                            <Link :href="show(link.id)">View analytics</Link>
+                        </Button>
                         <Button
                             v-if="link.qr_ready && link.qr_download_url"
                             size="sm"
