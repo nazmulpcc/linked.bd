@@ -6,15 +6,32 @@ use App\Models\Link;
 use App\Models\LinkAccessToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+
+beforeEach(function () {
+    config()->set('services.turnstile.secret_key', 'test-secret');
+    Http::fake([
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+            'success' => true,
+        ]),
+    ]);
+});
+
+function withTurnstile(array $payload): array
+{
+    return array_merge($payload, [
+        'cf-turnstile-response' => 'turnstile-token',
+    ]);
+}
 
 test('guests can create links on platform domains', function () {
     $domain = Domain::factory()->platform()->create();
 
-    $response = $this->post(route('links.store'), [
+    $response = $this->post(route('links.store'), withTurnstile([
         'destination_url' => 'https://example.com',
         'domain_id' => $domain->id,
-    ]);
+    ]));
 
     $response->assertRedirectContains('/links/success/');
 
@@ -34,11 +51,11 @@ test('guest expiry always defaults to ttl', function () {
 
     $domain = Domain::factory()->platform()->create();
 
-    $response = $this->post(route('links.store'), [
+    $response = $this->post(route('links.store'), withTurnstile([
         'destination_url' => 'https://example.com',
         'domain_id' => $domain->id,
         'expires_at' => $overrideExpiry->toDateTimeString(),
-    ]);
+    ]));
 
     $response->assertRedirectContains('/links/success/');
 
@@ -52,10 +69,10 @@ test('guest expiry always defaults to ttl', function () {
 test('destination urls cannot target private ips', function () {
     $domain = Domain::factory()->platform()->create();
 
-    $response = $this->post(route('links.store'), [
+    $response = $this->post(route('links.store'), withTurnstile([
         'destination_url' => 'http://127.0.0.1/admin',
         'domain_id' => $domain->id,
-    ]);
+    ]));
 
     $response->assertSessionHasErrors('destination_url');
 });
@@ -66,10 +83,10 @@ test('guest link creation is rate limited', function () {
     $response = null;
 
     for ($attempt = 0; $attempt < 11; $attempt++) {
-        $response = $this->post(route('links.store'), [
+        $response = $this->post(route('links.store'), withTurnstile([
             'destination_url' => 'https://example.com',
             'domain_id' => $domain->id,
-        ]);
+        ]));
     }
 
     $response->assertStatus(429);
@@ -80,10 +97,10 @@ test('link creation queues qr generation', function () {
 
     $domain = Domain::factory()->platform()->create();
 
-    $response = $this->post(route('links.store'), [
+    $response = $this->post(route('links.store'), withTurnstile([
         'destination_url' => 'https://example.com',
         'domain_id' => $domain->id,
-    ]);
+    ]));
 
     $response->assertRedirectContains('/links/success/');
 
@@ -93,11 +110,11 @@ test('link creation queues qr generation', function () {
 test('password is optional when creating links', function () {
     $domain = Domain::factory()->platform()->create();
 
-    $response = $this->post(route('links.store'), [
+    $response = $this->post(route('links.store'), withTurnstile([
         'destination_url' => 'https://example.com',
         'domain_id' => $domain->id,
         'password' => '',
-    ]);
+    ]));
 
     $response->assertRedirectContains('/links/success/');
 });
@@ -106,11 +123,11 @@ test('authenticated users can create custom domain links with aliases', function
     $user = User::factory()->create();
     $domain = Domain::factory()->for($user)->verified()->create();
 
-    $response = $this->actingAs($user)->post(route('links.store'), [
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
         'destination_url' => 'https://example.com',
         'domain_id' => $domain->id,
         'alias' => 'launch',
-    ]);
+    ]));
 
     $response->assertRedirectContains('/links/success/');
 
@@ -128,10 +145,10 @@ test('custom domains must be verified', function () {
         'status' => Domain::STATUS_PENDING,
     ]);
 
-    $response = $this->actingAs($user)->post(route('links.store'), [
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
         'destination_url' => 'https://example.com',
         'domain_id' => $domain->id,
-    ]);
+    ]));
 
     $response->assertSessionHasErrors('domain_id');
 });
@@ -140,11 +157,11 @@ test('platform domains reject aliases', function () {
     $user = User::factory()->create();
     $domain = Domain::factory()->platform()->create();
 
-    $response = $this->actingAs($user)->post(route('links.store'), [
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
         'destination_url' => 'https://example.com',
         'domain_id' => $domain->id,
         'alias' => 'promo',
-    ]);
+    ]));
 
     $response->assertSessionHasErrors('alias');
 });

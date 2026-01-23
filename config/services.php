@@ -41,4 +41,9 @@ return [
     ],
 
     'ip_country_db_path' => env('IP_COUNTRY_DB_PATH'),
+
+    'turnstile' => [
+        'site_key' => env('CLOUDFLARE_TURNSTILE_KEY'),
+        'secret_key' => env('CLOUDFLARE_TURNSTILE_SECRET'),
+    ],
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Links;
 
+use App\Rules\TurnstileResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -55,6 +56,10 @@ class StoreLinkRequest extends FormRequest
                 'date',
                 'after:now',
             ],
+            'cf-turnstile-response' => [
+                'required',
+                new TurnstileResponse,
+            ],
         ];
     }
 
@@ -71,6 +76,7 @@ class StoreLinkRequest extends FormRequest
             'alias.regex' => 'Aliases can use letters, numbers, and dashes.',
             'password.min' => 'Passwords must be at least 6 characters.',
             'expires_at.after' => 'The expiration date must be in the future.',
+            'cf-turnstile-response.required' => 'Complete the Turnstile challenge to continue.',
         ];
     }
 

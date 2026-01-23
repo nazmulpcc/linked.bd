@@ -18,6 +18,7 @@ const props = defineProps<{
     domains: Domain[];
     guestTtlDays: number;
     isGuest: boolean;
+    turnstileSiteKey: string | null;
 }>();
 
 const selectedDomainId = ref(
@@ -39,7 +40,14 @@ const selectClass =
 </script>
 
 <template>
-    <Head title="Create link" />
+    <Head title="Create link">
+        <script
+            v-if="turnstileSiteKey"
+            src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+            async
+            defer
+        ></script>
+    </Head>
 
     <AppLayout
         title="Create a short link"
@@ -180,6 +188,11 @@ const selectClass =
                         Guest links expire after {{ guestTtlDays }} days by
                         default.
                     </p>
+
+                    <div v-if="turnstileSiteKey" class="grid gap-2">
+                        <div class="cf-turnstile" :data-sitekey="turnstileSiteKey"></div>
+                        <InputError :message="errors['cf-turnstile-response']" />
+                    </div>
 
                     <div class="flex flex-wrap gap-3">
                         <Button type="submit" :disabled="processing">

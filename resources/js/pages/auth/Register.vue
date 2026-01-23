@@ -9,6 +9,10 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 import { Form, Head } from '@inertiajs/vue3';
+
+defineProps<{
+    turnstileSiteKey: string | null;
+}>();
 </script>
 
 <template>
@@ -16,7 +20,14 @@ import { Form, Head } from '@inertiajs/vue3';
         title="Create an account"
         description="Enter your details below to create your account"
     >
-        <Head title="Register" />
+        <Head title="Register">
+            <script
+                v-if="turnstileSiteKey"
+                src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+                async
+                defer
+            ></script>
+        </Head>
 
         <Form
             v-bind="store.form()"
@@ -80,6 +91,11 @@ import { Form, Head } from '@inertiajs/vue3';
                         placeholder="Confirm password"
                     />
                     <InputError :message="errors.password_confirmation" />
+                </div>
+
+                <div v-if="turnstileSiteKey" class="grid gap-2">
+                    <div class="cf-turnstile" :data-sitekey="turnstileSiteKey"></div>
+                    <InputError :message="errors['cf-turnstile-response']" />
                 </div>
 
                 <Button

@@ -41,6 +41,7 @@ class LinkController extends Controller
             'domains' => $domains,
             'guestTtlDays' => config('links.guest_ttl_days'),
             'isGuest' => $request->user() === null,
+            'turnstileSiteKey' => config('services.turnstile.site_key'),
         ]);
     }
 
