@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\LinkType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,9 @@ use Illuminate\Support\Str;
  * @property int|null $user_id
  * @property string|null $code
  * @property string|null $alias
+ * @property \App\Enums\LinkType $link_type
  * @property string $destination_url
+ * @property string|null $fallback_destination_url
  * @property string|null $password_hash
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property int $click_count
@@ -49,6 +52,11 @@ class Link extends Model
         return $this->hasMany(LinkVisit::class);
     }
 
+    public function rules(): HasMany
+    {
+        return $this->hasMany(LinkRule::class);
+    }
+
     protected static function booted(): void
     {
         static::creating(function (self $link) {
@@ -66,6 +74,7 @@ class Link extends Model
     protected function casts(): array
     {
         return [
+            'link_type' => LinkType::class,
             'expires_at' => 'datetime',
             'last_accessed_at' => 'datetime',
             'click_count' => 'integer',

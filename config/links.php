@@ -3,4 +3,10 @@
 return [
     'guest_ttl_days' => env('LINK_GUEST_TTL_DAYS', 7),
     'system_domains' => env('SYSTEM_DOMAINS', ''),
+    'dynamic' => [
+        'max_rules' => env('LINK_DYNAMIC_MAX_RULES', 10),
+        'max_conditions_per_rule' => env('LINK_DYNAMIC_MAX_CONDITIONS_PER_RULE', 8),
+        'max_total_conditions' => env('LINK_DYNAMIC_MAX_TOTAL_CONDITIONS', 24),
+        'allow_regex' => env('LINK_DYNAMIC_ALLOW_REGEX', false),
+    ],
 ];

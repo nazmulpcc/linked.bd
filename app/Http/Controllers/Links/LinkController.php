@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Links;
 
+use App\Enums\LinkType;
 use App\Events\LinkCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Links\StoreLinkRequest;
@@ -47,6 +48,7 @@ class LinkController extends Controller
 
     public function store(StoreLinkRequest $request): RedirectResponse
     {
+        $linkType = LinkType::tryFrom($request->string('link_type')->toString()) ?? LinkType::Static;
         $domain = $this->resolveDomainForCreate($request);
         $alias = $this->normalizeAlias($request->string('alias')->toString());
 
@@ -64,19 +66,31 @@ class LinkController extends Controller
 
         $expiresAt = $this->resolveExpiry($request);
         $code = $this->generateCode($domain);
+        $fallbackDestination = $this->normalizeDestination($request->string('fallback_destination_url')->toString());
+        $destinationUrl = $this->normalizeDestination($request->string('destination_url')->toString());
+
+        if ($linkType === LinkType::Dynamic) {
+            $destinationUrl = $fallbackDestination;
+        }
 
         $link = Link::query()->create([
             'domain_id' => $domain->id,
             'user_id' => optional($request->user())->id,
             'code' => $code,
             'alias' => $alias,
-            'destination_url' => $request->string('destination_url')->toString(),
+            'link_type' => $linkType,
+            'destination_url' => $destinationUrl,
+            'fallback_destination_url' => $fallbackDestination,
             'password_hash' => $this->hashPassword($request->string('password')->toString()),
             'expires_at' => $expiresAt,
             'click_count' => 0,
             'last_accessed_at' => null,
             'qr_path' => null,
         ]);
+
+        if ($linkType === LinkType::Dynamic) {
+            $this->storeDynamicRules($request, $link);
+        }
 
         event(new LinkCreated($link));
 
@@ -194,6 +208,17 @@ class LinkController extends Controller
         return Str::lower($normalized);
     }
 
+    private function normalizeDestination(string $destination): ?string
+    {
+        $normalized = trim($destination);
+
+        if ($normalized === '') {
+            return null;
+        }
+
+        return $normalized;
+    }
+
     private function aliasExists(Domain $domain, string $alias): bool
     {
         return Link::query()
@@ -234,6 +259,48 @@ class LinkController extends Controller
         }
 
         return Hash::make($trimmed);
+    }
+
+    private function storeDynamicRules(StoreLinkRequest $request, Link $link): void
+    {
+        $rules = $request->input('rules');
+
+        if (! is_array($rules)) {
+            return;
+        }
+
+        foreach ($rules as $rule) {
+            if (! is_array($rule)) {
+                continue;
+            }
+
+            $enabled = array_key_exists('enabled', $rule) ? (bool) $rule['enabled'] : true;
+
+            $linkRule = $link->rules()->create([
+                'priority' => (int) ($rule['priority'] ?? 0),
+                'destination_url' => (string) ($rule['destination_url'] ?? ''),
+                'is_fallback' => false,
+                'enabled' => $enabled,
+            ]);
+
+            $conditions = $rule['conditions'] ?? [];
+
+            if (! is_array($conditions)) {
+                continue;
+            }
+
+            foreach ($conditions as $condition) {
+                if (! is_array($condition)) {
+                    continue;
+                }
+
+                $linkRule->conditions()->create([
+                    'condition_type' => (string) ($condition['condition_type'] ?? ''),
+                    'operator' => (string) ($condition['operator'] ?? ''),
+                    'value' => $condition['value'] ?? null,
+                ]);
+            }
+        }
     }
 
     private function shortUrl(Request $request, Link $link): string

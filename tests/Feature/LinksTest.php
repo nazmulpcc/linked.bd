@@ -181,3 +181,49 @@ test('success page renders for access tokens', function () {
     $response->assertOk();
     $response->assertSee('go.example.com');
 });
+
+test('dynamic links require fallback and rules', function () {
+    $user = User::factory()->create();
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
+        'domain_id' => $domain->id,
+        'link_type' => 'dynamic',
+    ]));
+
+    $response->assertSessionHasErrors(['fallback_destination_url', 'rules']);
+});
+
+test('dynamic link rules are persisted', function () {
+    $user = User::factory()->create();
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
+        'domain_id' => $domain->id,
+        'link_type' => 'dynamic',
+        'fallback_destination_url' => 'https://example.com/fallback',
+        'rules' => [
+            [
+                'priority' => 1,
+                'destination_url' => 'https://example.com/us',
+                'enabled' => true,
+                'conditions' => [
+                    [
+                        'condition_type' => 'country',
+                        'operator' => 'equals',
+                        'value' => 'US',
+                    ],
+                ],
+            ],
+        ],
+    ]));
+
+    $response->assertRedirectContains('/links/success/');
+
+    $link = Link::query()->firstOrFail();
+
+    expect($link->link_type->value)->toBe('dynamic')
+        ->and($link->fallback_destination_url)->toBe('https://example.com/fallback')
+        ->and($link->rules)->toHaveCount(1)
+        ->and($link->rules->first()->conditions)->toHaveCount(1);
+});
