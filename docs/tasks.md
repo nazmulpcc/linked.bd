@@ -349,16 +349,16 @@
   * [ ] Add UI-driven manual test checklist page (optional) for QA
   * [x] Acceptance: dynamic redirects behave correctly across defined scenarios
 
-* [ ] 23. Safety controls for dynamic rules
+* [x] 23. Safety controls for dynamic rules
 
-  * [ ] Enforce limits (configurable):
+  * [x] Enforce limits (configurable):
 
-    * [ ] max rules per link
-    * [ ] max conditions per rule
-    * [ ] max total conditions per link
-  * [ ] Validate and normalize referrer matching inputs (domain parsing, trim, lowercase)
-  * [ ] If regex is supported:
+    * [x] max rules per link
+    * [x] max conditions per rule
+    * [x] max total conditions per link
+  * [x] Validate and normalize referrer matching inputs (domain parsing, trim, lowercase)
+  * [x] If regex is supported:
 
-    * [ ] Restrict to referrer/path only
-    * [ ] Add max length and reject catastrophic patterns (or disable regex entirely for v1)
-  * [ ] Acceptance: dynamic feature cannot degrade redirect performance or be abused easily
+    * [x] Restrict to referrer/path only
+    * [x] Add max length and reject catastrophic patterns (or disable regex entirely for v1)
+  * [x] Acceptance: dynamic feature cannot degrade redirect performance or be abused easily

@@ -227,3 +227,74 @@ test('dynamic link rules are persisted', function () {
         ->and($link->rules)->toHaveCount(1)
         ->and($link->rules->first()->conditions)->toHaveCount(1);
 });
+
+test('referrer conditions are normalized', function () {
+    $user = User::factory()->create();
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
+        'domain_id' => $domain->id,
+        'link_type' => 'dynamic',
+        'fallback_destination_url' => 'https://example.com/fallback',
+        'rules' => [
+            [
+                'priority' => 1,
+                'destination_url' => 'https://example.com/us',
+                'enabled' => true,
+                'conditions' => [
+                    [
+                        'condition_type' => 'referrer_domain',
+                        'operator' => 'equals',
+                        'value' => 'https://News.Example.com/path?utm=1',
+                    ],
+                    [
+                        'condition_type' => 'referrer_path',
+                        'operator' => 'equals',
+                        'value' => 'https://news.example.com/Stories/Top?utm=1',
+                    ],
+                ],
+            ],
+        ],
+    ]));
+
+    $response->assertRedirectContains('/links/success/');
+
+    $link = Link::query()->firstOrFail();
+    $conditions = $link->rules->first()->conditions
+        ->keyBy(fn ($condition) => $condition->condition_type->value);
+
+    expect($conditions['referrer_domain']->value)->toBe('news.example.com')
+        ->and($conditions['referrer_path']->value)->toBe('/stories/top');
+});
+
+test('unsafe regex patterns are rejected', function () {
+    config([
+        'links.dynamic.allow_regex' => true,
+        'links.dynamic.regex_max_length' => 120,
+    ]);
+
+    $user = User::factory()->create();
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
+        'domain_id' => $domain->id,
+        'link_type' => 'dynamic',
+        'fallback_destination_url' => 'https://example.com/fallback',
+        'rules' => [
+            [
+                'priority' => 1,
+                'destination_url' => 'https://example.com/us',
+                'enabled' => true,
+                'conditions' => [
+                    [
+                        'condition_type' => 'referrer_path',
+                        'operator' => 'regex',
+                        'value' => '/(a+)+$/',
+                    ],
+                ],
+            ],
+        ],
+    ]));
+
+    $response->assertSessionHasErrors('rules.0.conditions.0.value');
+});

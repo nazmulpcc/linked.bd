@@ -11,6 +11,7 @@ use App\Enums\LinkType;
 use App\Enums\OperatingSystem;
 use App\Rules\TurnstileResponse;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -165,6 +166,19 @@ class StoreLinkRequest extends FormRequest
             $this->validateDestinationUrls($validator);
             $this->validateDynamicRules($validator);
         });
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $rules = $this->input('rules');
+
+        if (! is_array($rules)) {
+            return;
+        }
+
+        $this->merge([
+            'rules' => $this->normalizeReferrerConditions($rules),
+        ]);
     }
 
     private function validateDestinationUrls(Validator $validator): void
@@ -424,6 +438,13 @@ class StoreLinkRequest extends FormRequest
                 return;
             }
 
+            if (
+                ($type === ConditionType::ReferrerDomain || $type === ConditionType::ReferrerPath)
+                && ! $this->validateReferrerValue($validator, $path, $singleValue, $type, $operator)
+            ) {
+                return;
+            }
+
             if (! $this->valueMatchesType($type, $singleValue, $path, $validator)) {
                 return;
             }
@@ -489,6 +510,198 @@ class StoreLinkRequest extends FormRequest
         }
 
         return true;
+    }
+
+    private function validateReferrerValue(
+        Validator $validator,
+        string $path,
+        string $value,
+        ConditionType $type,
+        ConditionOperator $operator,
+    ): bool {
+        if ($operator === ConditionOperator::Regex) {
+            return $this->validateRegexValue($validator, $path, $value);
+        }
+
+        if (str_contains($value, ' ')) {
+            $validator->errors()->add($path, 'Referrer values cannot include spaces.');
+
+            return false;
+        }
+
+        if ($type === ConditionType::ReferrerDomain) {
+            if (
+                in_array($operator, [
+                    ConditionOperator::Equals,
+                    ConditionOperator::NotEquals,
+                    ConditionOperator::StartsWith,
+                    ConditionOperator::EndsWith,
+                ], true)
+                && ! preg_match('/^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/', $value)
+            ) {
+                $validator->errors()->add($path, 'Referrer domains must be valid hostnames.');
+
+                return false;
+            }
+        }
+
+        if ($type === ConditionType::ReferrerPath && ! Str::startsWith($value, '/')) {
+            $validator->errors()->add($path, 'Referrer paths must start with /.');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function validateRegexValue(Validator $validator, string $path, string $value): bool
+    {
+        $maxLength = (int) config('links.dynamic.regex_max_length');
+
+        if ($maxLength > 0 && Str::length($value) > $maxLength) {
+            $validator->errors()->add($path, 'Regex patterns are too long.');
+
+            return false;
+        }
+
+        if (! preg_match('/^(.).+\\1[imsxuADU]*$/', $value)) {
+            $validator->errors()->add($path, 'Regex patterns must include valid delimiters.');
+
+            return false;
+        }
+
+        if (@preg_match($value, '') === false) {
+            $validator->errors()->add($path, 'Regex patterns must be valid.');
+
+            return false;
+        }
+
+        if (
+            preg_match('/\\((?:[^()\\\\]|\\\\.)+[+*](?:[^()\\\\]|\\\\.)*\\)[+*]/', $value)
+            || preg_match('/\\.\\*(?:\\.\\*)+/', $value)
+            || preg_match('/\\.\\+(?:\\.\\+)+/', $value)
+        ) {
+            $validator->errors()->add($path, 'Regex patterns are too complex.');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  array<int, mixed>  $rules
+     * @return array<int, mixed>
+     */
+    private function normalizeReferrerConditions(array $rules): array
+    {
+        foreach ($rules as $ruleIndex => $rule) {
+            if (! is_array($rule)) {
+                continue;
+            }
+
+            $conditions = $rule['conditions'] ?? null;
+
+            if (! is_array($conditions)) {
+                continue;
+            }
+
+            foreach ($conditions as $conditionIndex => $condition) {
+                if (! is_array($condition)) {
+                    continue;
+                }
+
+                $type = $condition['condition_type'] ?? null;
+
+                if (! is_string($type)) {
+                    continue;
+                }
+
+                $normalizedValue = $this->normalizeReferrerValue($type, $condition['value'] ?? null);
+
+                if ($normalizedValue === null) {
+                    continue;
+                }
+
+                $conditions[$conditionIndex]['value'] = $normalizedValue;
+            }
+
+            $rules[$ruleIndex]['conditions'] = $conditions;
+        }
+
+        return $rules;
+    }
+
+    private function normalizeReferrerValue(string $type, mixed $value): array|string|null
+    {
+        if ($type !== ConditionType::ReferrerDomain->value && $type !== ConditionType::ReferrerPath->value) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            $normalized = array_values(array_filter(array_map(function ($item) use ($type) {
+                if (! is_string($item)) {
+                    return null;
+                }
+
+                return $this->normalizeReferrerString($type, $item);
+            }, $value)));
+
+            return $normalized === [] ? null : $normalized;
+        }
+
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        return $this->normalizeReferrerString($type, $value);
+    }
+
+    private function normalizeReferrerString(string $type, string $value): ?string
+    {
+        $trimmed = trim($value);
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        if ($type === ConditionType::ReferrerDomain->value) {
+            $candidate = Str::lower($trimmed);
+            $host = str_contains($candidate, '://')
+                ? parse_url($candidate, PHP_URL_HOST)
+                : parse_url('https://'.$candidate, PHP_URL_HOST);
+
+            if (is_string($host) && $host !== '') {
+                return Str::lower($host);
+            }
+
+            return $candidate;
+        }
+
+        $path = str_contains($trimmed, '://')
+            ? parse_url($trimmed, PHP_URL_PATH)
+            : $trimmed;
+
+        if (! is_string($path) || $path === '') {
+            return null;
+        }
+
+        $path = strtok($path, '?') ?: $path;
+
+        if (! Str::startsWith($path, '/')) {
+            $slashPos = strpos($path, '/');
+            if ($slashPos !== false) {
+                $path = substr($path, $slashPos);
+            }
+        }
+
+        $path = trim($path);
+
+        if ($path === '') {
+            return null;
+        }
+
+        return Str::lower($path);
     }
 
     /**
