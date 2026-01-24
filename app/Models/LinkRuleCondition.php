@@ -22,6 +22,8 @@ class LinkRuleCondition extends Model
     /** @use HasFactory<\Database\Factories\LinkRuleConditionFactory> */
     use HasFactory;
 
+    protected $touches = ['rule'];
+
     public function rule(): BelongsTo
     {
         return $this->belongsTo(LinkRule::class, 'link_rule_id');

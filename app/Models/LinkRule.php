@@ -22,6 +22,8 @@ class LinkRule extends Model
     /** @use HasFactory<\Database\Factories\LinkRuleFactory> */
     use HasFactory;
 
+    protected $touches = ['link'];
+
     public function link(): BelongsTo
     {
         return $this->belongsTo(Link::class);

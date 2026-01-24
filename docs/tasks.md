@@ -327,13 +327,13 @@
     * [x] Fallback clicks
   * [x] Acceptance: user can see which rule is being selected and how often
 
-* [ ] 21. Caching and performance optimization (dynamic rules)
+* [x] 21. Caching and performance optimization (dynamic rules)
 
-  * [ ] Add caching strategy for rule sets per link (e.g., cache key by link_id + updated_at)
-  * [ ] Invalidate cache when rules/conditions change
-  * [ ] Ensure cache is host-aware where needed (domain+slug resolution remains correct)
-  * [ ] Add feature flag/config to disable caching if troubleshooting
-  * [ ] Acceptance: dynamic evaluation avoids repeated DB queries under load
+  * [x] Add caching strategy for rule sets per link (e.g., cache key by link_id + updated_at)
+  * [x] Invalidate cache when rules/conditions change
+  * [x] Ensure cache is host-aware where needed (domain+slug resolution remains correct)
+  * [x] Add feature flag/config to disable caching if troubleshooting
+  * [x] Acceptance: dynamic evaluation avoids repeated DB queries under load
 
 * [ ] 22. Testing and verification scenarios (dynamic)
 

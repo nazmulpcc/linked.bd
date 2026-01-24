@@ -13,6 +13,7 @@ use App\Models\LinkRule;
 use App\Models\LinkRuleCondition;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class LinkRedirectResolver
@@ -94,32 +95,27 @@ class LinkRedirectResolver
         $maxConditionsPerRule = (int) config('links.dynamic.max_conditions_per_rule');
         $maxTotalConditions = (int) config('links.dynamic.max_total_conditions');
 
-        $rules = $link->rules()
-            ->where('enabled', true)
-            ->orderBy('priority')
-            ->limit($maxRules)
-            ->with('conditions')
-            ->get();
+        $rules = $this->loadRules($link, $maxRules, $maxConditionsPerRule);
 
         $evaluatedConditions = 0;
 
         foreach ($rules as $rule) {
-            $conditions = $rule->conditions->take($maxConditionsPerRule);
+            $conditions = $rule['conditions'] ?? [];
 
-            if ($conditions->isEmpty()) {
+            if ($conditions === []) {
                 continue;
             }
 
-            $evaluatedConditions += $conditions->count();
+            $evaluatedConditions += count($conditions);
 
             if ($evaluatedConditions > $maxTotalConditions) {
                 break;
             }
 
-            if ($this->ruleMatches($rule, $conditions->all(), $context)) {
+            if ($this->ruleMatches($conditions, $context)) {
                 return [
-                    'destination_url' => $rule->destination_url,
-                    'rule_id' => $rule->id,
+                    'destination_url' => $rule['destination_url'],
+                    'rule_id' => $rule['id'],
                 ];
             }
         }
@@ -131,10 +127,10 @@ class LinkRedirectResolver
     }
 
     /**
-     * @param  array<int, LinkRuleCondition>  $conditions
+     * @param  array<int, array{condition_type: string|null, operator: string|null, value: mixed}>  $conditions
      * @param  array<string, mixed>  $context
      */
-    private function ruleMatches(LinkRule $rule, array $conditions, array $context): bool
+    private function ruleMatches(array $conditions, array $context): bool
     {
         foreach ($conditions as $condition) {
             if (! $this->conditionMatches($condition, $context)) {
@@ -146,15 +142,16 @@ class LinkRedirectResolver
     }
 
     /**
+     * @param  array{condition_type: string|null, operator: string|null, value: mixed}  $condition
      * @param  array<string, mixed>  $context
      */
-    private function conditionMatches(LinkRuleCondition $condition, array $context): bool
+    private function conditionMatches(array $condition, array $context): bool
     {
-        $type = $condition->condition_type;
-        $operator = $condition->operator;
-        $value = $condition->value;
+        $type = ConditionType::tryFrom($condition['condition_type'] ?? '');
+        $operator = ConditionOperator::tryFrom($condition['operator'] ?? '');
+        $value = $condition['value'] ?? null;
 
-        if (! $type instanceof ConditionType || ! $operator instanceof ConditionOperator) {
+        if (! $type || ! $operator) {
             return false;
         }
 
@@ -171,6 +168,63 @@ class LinkRedirectResolver
             ConditionType::Language => $this->evaluateString($context['language'] ?? null, $operator, $value),
             ConditionType::TimeWindow => $this->evaluateTimeWindow($operator, $value),
         };
+    }
+
+    /**
+     * @return array<int, array{id: int, destination_url: string, conditions: array<int, array{condition_type: string|null, operator: string|null, value: mixed}>}>
+     */
+    private function loadRules(Link $link, int $maxRules, int $maxConditionsPerRule): array
+    {
+        $enabled = (bool) config('links.dynamic.cache.enabled', false);
+        $ttlSeconds = (int) config('links.dynamic.cache.ttl_seconds', 0);
+        $resolver = fn () => $this->queryRules($link, $maxRules, $maxConditionsPerRule);
+
+        if (! $enabled || $ttlSeconds <= 0) {
+            return $resolver();
+        }
+
+        $cacheKey = $this->ruleCacheKey($link, $maxRules, $maxConditionsPerRule);
+
+        return Cache::remember($cacheKey, now()->addSeconds($ttlSeconds), $resolver);
+    }
+
+    private function ruleCacheKey(Link $link, int $maxRules, int $maxConditionsPerRule): string
+    {
+        $timestamp = $link->updated_at?->getTimestamp() ?? 0;
+
+        return sprintf(
+            'links.dynamic.rules.%s.%s.%s.%s',
+            $link->id,
+            $timestamp,
+            $maxRules,
+            $maxConditionsPerRule,
+        );
+    }
+
+    /**
+     * @return array<int, array{id: int, destination_url: string, conditions: array<int, array{condition_type: string|null, operator: string|null, value: mixed}>}>
+     */
+    private function queryRules(Link $link, int $maxRules, int $maxConditionsPerRule): array
+    {
+        return $link->rules()
+            ->where('enabled', true)
+            ->orderBy('priority')
+            ->limit($maxRules)
+            ->with('conditions')
+            ->get()
+            ->map(fn (LinkRule $rule) => [
+                'id' => $rule->id,
+                'destination_url' => $rule->destination_url,
+                'conditions' => $rule->conditions
+                    ->take($maxConditionsPerRule)
+                    ->map(fn (LinkRuleCondition $condition) => [
+                        'condition_type' => $condition->condition_type?->value ?? null,
+                        'operator' => $condition->operator?->value ?? null,
+                        'value' => $condition->value,
+                    ])
+                    ->all(),
+            ])
+            ->all();
     }
 
     private function evaluateTimeWindow(ConditionOperator $operator, mixed $value): bool
