@@ -2,6 +2,9 @@
 
 use App\Models\Domain;
 use App\Models\Link;
+use App\Models\LinkRule;
+use App\Models\LinkRuleCondition;
+use App\Services\IpCountryResolver;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -148,4 +151,76 @@ test('password protected links reject invalid passwords', function () {
 
     expect($link->click_count)->toBe(0)
         ->and($link->last_accessed_at)->toBeNull();
+});
+
+test('dynamic links resolve matching rules before fallback', function () {
+    app()->instance(IpCountryResolver::class, new class extends IpCountryResolver
+    {
+        public function resolve(string $ip): ?string
+        {
+            return 'US';
+        }
+    });
+
+    $domain = Domain::factory()->platform()->create([
+        'hostname' => 'dyn.example.test',
+    ]);
+    $link = Link::factory()->for($domain)->create([
+        'code' => 'dyn001',
+        'link_type' => 'dynamic',
+        'destination_url' => 'https://example.com/fallback',
+        'fallback_destination_url' => 'https://example.com/fallback',
+    ]);
+
+    $rule = LinkRule::factory()->for($link)->create([
+        'priority' => 1,
+        'destination_url' => 'https://example.com/us',
+        'enabled' => true,
+    ]);
+
+    LinkRuleCondition::factory()->for($rule, 'rule')->create([
+        'condition_type' => 'country',
+        'operator' => 'equals',
+        'value' => 'US',
+    ]);
+
+    $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/us');
+});
+
+test('dynamic links fall back when no rule matches', function () {
+    app()->instance(IpCountryResolver::class, new class extends IpCountryResolver
+    {
+        public function resolve(string $ip): ?string
+        {
+            return 'CA';
+        }
+    });
+
+    $domain = Domain::factory()->platform()->create([
+        'hostname' => 'dyn-fallback.example.test',
+    ]);
+    $link = Link::factory()->for($domain)->create([
+        'code' => 'dyn002',
+        'link_type' => 'dynamic',
+        'destination_url' => 'https://example.com/fallback',
+        'fallback_destination_url' => 'https://example.com/fallback',
+    ]);
+
+    $rule = LinkRule::factory()->for($link)->create([
+        'priority' => 1,
+        'destination_url' => 'https://example.com/us',
+        'enabled' => true,
+    ]);
+
+    LinkRuleCondition::factory()->for($rule, 'rule')->create([
+        'condition_type' => 'country',
+        'operator' => 'equals',
+        'value' => 'US',
+    ]);
+
+    $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/fallback');
 });

@@ -8,6 +8,7 @@ use App\Jobs\RecordLinkClick;
 use App\Models\Domain;
 use App\Models\Link;
 use App\Services\IpCountryResolver;
+use App\Services\LinkRedirectResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -39,9 +40,10 @@ class RedirectController extends Controller
         }
 
         if (! $link->password_hash) {
+            $destinationUrl = $this->resolveDestination($request, $link);
             $this->recordClick($request, $link);
 
-            return redirect()->away($link->destination_url);
+            return redirect()->away($destinationUrl);
         }
 
         return Inertia::render('links/Password', [
@@ -74,9 +76,10 @@ class RedirectController extends Controller
         }
 
         if (! $link->password_hash) {
+            $destinationUrl = $this->resolveDestination($request, $link);
             $this->recordClick($request, $link);
 
-            return Inertia::location($link->destination_url);
+            return Inertia::location($destinationUrl);
         }
 
         $key = $this->throttleKey($request, $slug);
@@ -101,9 +104,10 @@ class RedirectController extends Controller
 
         RateLimiter::clear($key);
 
+        $destinationUrl = $this->resolveDestination($request, $link);
         $this->recordClick($request, $link);
 
-        return Inertia::location($link->destination_url);
+        return Inertia::location($destinationUrl);
     }
 
     private function resolveDomain(Request $request): ?Domain
@@ -243,5 +247,10 @@ class RedirectController extends Controller
         }
 
         return app(IpCountryResolver::class)->resolve($ip);
+    }
+
+    private function resolveDestination(Request $request, Link $link): string
+    {
+        return app(LinkRedirectResolver::class)->resolve($link, $request);
     }
 }
