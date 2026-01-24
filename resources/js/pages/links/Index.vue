@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { create, destroy, show } from '@/routes/links';
 import { Form, Head, Link } from '@inertiajs/vue3';
@@ -111,11 +121,46 @@ defineProps<{
                         >
                             <a :href="link.qr_download_url">Download QR</a>
                         </Button>
-                        <Form v-bind="destroy.form(link.ulid)" class="pointer-events-auto">
-                            <Button type="submit" size="sm" variant="ghost">
-                                Delete
-                            </Button>
-                        </Form>
+                        <Dialog>
+                            <DialogTrigger as-child>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    class="pointer-events-auto text-destructive hover:text-destructive"
+                                >
+                                    Delete
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <Form
+                                    v-bind="destroy.form(link.ulid)"
+                                    class="grid gap-6"
+                                >
+                                    <DialogHeader class="space-y-3">
+                                        <DialogTitle>Delete this link?</DialogTitle>
+                                        <DialogDescription>
+                                            This will permanently delete
+                                            <span class="font-medium text-foreground">{{ link.short_url }}</span>.
+                                            The link will stop working immediately.
+                                        </DialogDescription>
+                                    </DialogHeader>
+
+                                    <DialogFooter class="gap-2">
+                                        <DialogClose as-child>
+                                            <Button type="button" variant="secondary">
+                                                Cancel
+                                            </Button>
+                                        </DialogClose>
+                                        <Button
+                                            type="submit"
+                                            variant="destructive"
+                                        >
+                                            Delete link
+                                        </Button>
+                                    </DialogFooter>
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             </div>

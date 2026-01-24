@@ -6,6 +6,7 @@ use App\Models\LinkRule;
 use App\Models\LinkRuleCondition;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('users can view their links list', function () {
     $user = User::factory()->create();
@@ -15,6 +16,10 @@ test('users can view their links list', function () {
     $response = $this->actingAs($user)->get(route('links.index'));
 
     $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('links/Index')
+        ->has('links.data', 1)
+    );
 });
 
 test('users cannot delete links they do not own', function () {
