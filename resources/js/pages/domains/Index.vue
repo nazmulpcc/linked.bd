@@ -2,6 +2,16 @@
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -134,11 +144,41 @@ const recordName = (hostname: string) => hostname;
                             </Button>
                         </Form>
 
-                        <Form v-if="domain.links_count === 0" v-bind="destroy(domain.id)">
-                            <Button type="submit" size="sm" variant="ghost">
-                                Remove
-                            </Button>
-                        </Form>
+                        <Dialog v-if="domain.links_count === 0">
+                            <DialogTrigger as-child>
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="ghost"
+                                    class="text-destructive hover:text-destructive"
+                                >
+                                    Remove
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <Form v-bind="destroy.form(domain.id)" class="grid gap-6">
+                                    <DialogHeader class="space-y-3">
+                                        <DialogTitle>Remove this domain?</DialogTitle>
+                                        <DialogDescription>
+                                            This will permanently remove
+                                            <span class="font-medium text-foreground">{{ domain.hostname }}</span>.
+                                            Links on this domain will stop working.
+                                        </DialogDescription>
+                                    </DialogHeader>
+
+                                    <DialogFooter class="gap-2">
+                                        <DialogClose as-child>
+                                            <Button type="button" variant="secondary">
+                                                Cancel
+                                            </Button>
+                                        </DialogClose>
+                                        <Button type="submit" variant="destructive">
+                                            Remove domain
+                                        </Button>
+                                    </DialogFooter>
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             </section>
