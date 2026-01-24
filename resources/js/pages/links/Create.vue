@@ -167,6 +167,78 @@ const dayOptions = [
     'sunday',
 ];
 
+const templateOptions = [
+    {
+        id: 'mobile-desktop',
+        label: 'Mobile vs Desktop',
+        description: 'Send mobile users to one URL and desktop users to another.',
+        create: () => [
+            {
+                priority: 1,
+                destination_url: '',
+                enabled: true,
+                conditions: [
+                    {
+                        condition_type: 'device_type',
+                        operator: 'equals',
+                        value: 'mobile',
+                    },
+                ],
+            },
+            {
+                priority: 2,
+                destination_url: '',
+                enabled: true,
+                conditions: [
+                    {
+                        condition_type: 'device_type',
+                        operator: 'equals',
+                        value: 'desktop',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'country-split',
+        label: 'Country split',
+        description: 'Route specific countries to a localized destination.',
+        create: () => [
+            {
+                priority: 1,
+                destination_url: '',
+                enabled: true,
+                conditions: [
+                    {
+                        condition_type: 'country',
+                        operator: 'in',
+                        values: ['US', 'CA'],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'referrer-split',
+        label: 'Referrer split',
+        description: 'Send traffic from a campaign domain to a tailored page.',
+        create: () => [
+            {
+                priority: 1,
+                destination_url: '',
+                enabled: true,
+                conditions: [
+                    {
+                        condition_type: 'referrer_domain',
+                        operator: 'contains',
+                        value: 'instagram.com',
+                    },
+                ],
+            },
+        ],
+    },
+];
+
 const createCondition = (): RuleCondition => ({
     id: `condition-${conditionCounter++}`,
     condition_type: 'country',
@@ -192,6 +264,21 @@ const createRule = (priority: number): Rule => ({
 });
 
 const rules = ref<Rule[]>([createRule(1)]);
+const previewContext = ref({
+    country: '',
+    device_type: 'desktop',
+    operating_system: '',
+    browser: '',
+    referrer_domain: '',
+    referrer_path: '',
+    utm_source: '',
+    utm_medium: '',
+    utm_campaign: '',
+    language: '',
+    day: '',
+    hour: null as number | null,
+    timezone: '',
+});
 
 const selectedDomain = computed(() =>
     props.domains.find((domain) => String(domain.id) === selectedDomainId.value),
@@ -314,6 +401,238 @@ const localValidationErrors = computed(() => {
 
     return errors;
 });
+
+const applyTemplate = (templateId: string) => {
+    const template = templateOptions.find((option) => option.id === templateId);
+
+    if (!template) {
+        return;
+    }
+
+    const templateRules = template.create().map((rule, index) => {
+        const conditions = rule.conditions.map((condition) => ({
+            id: `condition-${conditionCounter++}`,
+            condition_type: condition.condition_type,
+            operator: condition.operator,
+            value: condition.value ?? '',
+            values: condition.values ?? [''],
+            time: {
+                timezone: '',
+                days: [],
+                hours: {
+                    start: null,
+                    end: null,
+                },
+            },
+        }));
+
+        return {
+            id: `rule-${ruleCounter++}`,
+            priority: index + 1,
+            destination_url: rule.destination_url,
+            enabled: rule.enabled,
+            conditions,
+        } satisfies Rule;
+    });
+
+    rules.value = templateRules.length ? templateRules : [createRule(1)];
+    normalizeRulePriorities();
+};
+
+const previewResult = computed(() => {
+    if (!isDynamic.value) {
+        return null;
+    }
+
+    const context = {
+        country: previewContext.value.country.trim().toUpperCase() || null,
+        device_type: previewContext.value.device_type || null,
+        operating_system: previewContext.value.operating_system || null,
+        browser: previewContext.value.browser || null,
+        referrer_domain: previewContext.value.referrer_domain.trim().toLowerCase() || null,
+        referrer_path: previewContext.value.referrer_path.trim().toLowerCase() || null,
+        utm_source: previewContext.value.utm_source.trim().toLowerCase() || null,
+        utm_medium: previewContext.value.utm_medium.trim().toLowerCase() || null,
+        utm_campaign: previewContext.value.utm_campaign.trim().toLowerCase() || null,
+        language: previewContext.value.language.trim().toLowerCase() || null,
+        day: previewContext.value.day || null,
+        hour: previewContext.value.hour,
+        timezone: previewContext.value.timezone.trim() || null,
+    };
+
+    for (const rule of rules.value) {
+        if (!rule.enabled) {
+            continue;
+        }
+
+        const matches = rule.conditions.every((condition) =>
+            conditionMatchesPreview(condition, context),
+        );
+
+        if (matches) {
+            return {
+                rule,
+                destination: rule.destination_url,
+            };
+        }
+    }
+
+    return {
+        rule: null,
+        destination: fallbackDestination.value || 'Fallback',
+    };
+});
+
+const conditionMatchesPreview = (
+    condition: RuleCondition,
+    context: {
+        country: string | null;
+        device_type: string | null;
+        operating_system: string | null;
+        browser: string | null;
+        referrer_domain: string | null;
+        referrer_path: string | null;
+        utm_source: string | null;
+        utm_medium: string | null;
+        utm_campaign: string | null;
+        language: string | null;
+        day: string | null;
+        hour: number | null;
+        timezone: string | null;
+    },
+): boolean => {
+    if (condition.condition_type === 'time_window') {
+        return previewTimeWindowMatch(condition, context);
+    }
+
+    const target = matchTarget(condition.condition_type, context);
+
+    return previewValueMatch(target, condition);
+};
+
+const matchTarget = (type: string, context: Record<string, string | number | null>) => {
+    switch (type) {
+        case 'country':
+            return context.country;
+        case 'device_type':
+            return context.device_type;
+        case 'operating_system':
+            return context.operating_system;
+        case 'browser':
+            return context.browser;
+        case 'referrer_domain':
+            return context.referrer_domain;
+        case 'referrer_path':
+            return context.referrer_path;
+        case 'utm_source':
+            return context.utm_source;
+        case 'utm_medium':
+            return context.utm_medium;
+        case 'utm_campaign':
+            return context.utm_campaign;
+        case 'language':
+            return context.language;
+        default:
+            return null;
+    }
+};
+
+const previewValueMatch = (
+    target: string | number | null,
+    condition: RuleCondition,
+): boolean => {
+    if (operatorExpectsNoValue(condition.operator)) {
+        return condition.operator === 'exists'
+            ? target !== null && String(target).trim() !== ''
+            : target === null || String(target).trim() === '';
+    }
+
+    if (target === null || String(target).trim() === '') {
+        return false;
+    }
+
+    const normalizedTarget = String(target).toLowerCase();
+    const values = operatorExpectsList(condition.operator)
+        ? condition.values.map((value) => value.trim().toLowerCase()).filter(Boolean)
+        : [condition.value.trim().toLowerCase()].filter(Boolean);
+
+    if (values.length === 0) {
+        return false;
+    }
+
+    switch (condition.operator) {
+        case 'equals':
+            return normalizedTarget === values[0];
+        case 'not_equals':
+            return normalizedTarget !== values[0];
+        case 'in':
+            return values.includes(normalizedTarget);
+        case 'not_in':
+            return !values.includes(normalizedTarget);
+        case 'contains':
+            return normalizedTarget.includes(values[0]);
+        case 'not_contains':
+            return !normalizedTarget.includes(values[0]);
+        case 'starts_with':
+            return normalizedTarget.startsWith(values[0]);
+        case 'ends_with':
+            return normalizedTarget.endsWith(values[0]);
+        default:
+            return false;
+    }
+};
+
+const previewTimeWindowMatch = (
+    condition: RuleCondition,
+    context: {
+        day: string | null;
+        hour: number | null;
+        timezone: string | null;
+    },
+): boolean => {
+    if (condition.operator !== 'equals') {
+        return false;
+    }
+
+    const timezone = condition.time.timezone.trim();
+
+    if (!timezone) {
+        return false;
+    }
+
+    if (context.timezone && context.timezone !== timezone) {
+        return false;
+    }
+
+    if (condition.time.days.length) {
+        if (!context.day) {
+            return false;
+        }
+
+        if (!condition.time.days.includes(context.day)) {
+            return false;
+        }
+    }
+
+    const start = condition.time.hours.start;
+    const end = condition.time.hours.end;
+
+    if (start !== null && end !== null) {
+        if (context.hour === null) {
+            return false;
+        }
+
+        if (start <= end) {
+            if (context.hour < start || context.hour > end) {
+                return false;
+            }
+        } else if (context.hour < start && context.hour > end) {
+            return false;
+        }
+    }
+
+    return true;
+};
 </script>
 
 <template>
@@ -499,6 +818,26 @@ const localValidationErrors = computed(() => {
                         </div>
 
                         <div class="grid gap-3">
+                            <div class="grid gap-2">
+                                <p class="text-sm font-semibold">Rule templates</p>
+                                <div class="grid gap-2 sm:grid-cols-3">
+                                    <button
+                                        v-for="template in templateOptions"
+                                        :key="template.id"
+                                        type="button"
+                                        class="rounded-xl border border-border/70 bg-card p-3 text-left text-xs transition hover:border-primary/40 hover:bg-primary/5"
+                                        @click="applyTemplate(template.id)"
+                                    >
+                                        <p class="text-sm font-semibold">
+                                            {{ template.label }}
+                                        </p>
+                                        <p class="mt-1 text-xs text-muted-foreground">
+                                            {{ template.description }}
+                                        </p>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="flex flex-wrap items-center justify-between gap-3">
                                 <p class="text-sm font-semibold">
                                     Routing rules
@@ -807,6 +1146,106 @@ const localValidationErrors = computed(() => {
                                         </div>
                                     </div>
                                 </section>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 rounded-xl border border-dashed border-border/70 bg-background p-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-sm font-semibold">Preview evaluation</p>
+                                <span class="text-xs text-muted-foreground">
+                                    Simulate a visit to see which rule wins
+                                </span>
+                            </div>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Country</Label>
+                                    <Input v-model="previewContext.country" placeholder="US" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Device type</Label>
+                                    <select v-model="previewContext.device_type" :class="selectClass">
+                                        <option value="">Select</option>
+                                        <option value="mobile">Mobile</option>
+                                        <option value="desktop">Desktop</option>
+                                        <option value="tablet">Tablet</option>
+                                    </select>
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">OS</Label>
+                                    <select v-model="previewContext.operating_system" :class="selectClass">
+                                        <option value="">Select</option>
+                                        <option value="ios">iOS</option>
+                                        <option value="android">Android</option>
+                                        <option value="windows">Windows</option>
+                                        <option value="macos">macOS</option>
+                                        <option value="linux">Linux</option>
+                                    </select>
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Browser</Label>
+                                    <select v-model="previewContext.browser" :class="selectClass">
+                                        <option value="">Select</option>
+                                        <option value="chrome">Chrome</option>
+                                        <option value="safari">Safari</option>
+                                        <option value="firefox">Firefox</option>
+                                        <option value="edge">Edge</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Referrer domain</Label>
+                                    <Input v-model="previewContext.referrer_domain" placeholder="instagram.com" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Referrer path</Label>
+                                    <Input v-model="previewContext.referrer_path" placeholder="/stories" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">UTM source</Label>
+                                    <Input v-model="previewContext.utm_source" placeholder="newsletter" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">UTM medium</Label>
+                                    <Input v-model="previewContext.utm_medium" placeholder="email" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">UTM campaign</Label>
+                                    <Input v-model="previewContext.utm_campaign" placeholder="spring-launch" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Language</Label>
+                                    <Input v-model="previewContext.language" placeholder="en-US" />
+                                </div>
+                            </div>
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Day</Label>
+                                    <select v-model="previewContext.day" :class="selectClass">
+                                        <option value="">Select</option>
+                                        <option v-for="day in dayOptions" :key="day" :value="day">
+                                            {{ day }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Hour (0-23)</Label>
+                                    <Input v-model.number="previewContext.hour" type="number" min="0" max="23" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label class="text-xs">Timezone</Label>
+                                    <Input v-model="previewContext.timezone" placeholder="America/New_York" />
+                                </div>
+                            </div>
+                            <div class="rounded-lg border border-border/70 bg-card px-3 py-2 text-xs text-muted-foreground">
+                                <p class="text-xs font-semibold text-foreground">Preview result</p>
+                                <p v-if="previewResult?.rule">
+                                    Rule priority {{ previewResult.rule.priority }} →
+                                    <span class="text-foreground">{{ previewResult.destination || 'Destination missing' }}</span>
+                                </p>
+                                <p v-else>
+                                    Fallback →
+                                    <span class="text-foreground">{{ previewResult?.destination || 'Destination missing' }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
