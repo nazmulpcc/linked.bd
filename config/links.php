@@ -3,6 +3,7 @@
 return [
     'guest_ttl_days' => env('LINK_GUEST_TTL_DAYS', 7),
     'system_domains' => env('SYSTEM_DOMAINS', ''),
+    'domain_verification_cname' => env('LINK_DOMAIN_VERIFICATION_CNAME'),
     'dynamic' => [
         'max_rules' => env('LINK_DYNAMIC_MAX_RULES', 10),
         'max_conditions_per_rule' => env('LINK_DYNAMIC_MAX_CONDITIONS_PER_RULE', 8),

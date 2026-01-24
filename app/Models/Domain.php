@@ -34,7 +34,7 @@ class Domain extends Model
 
     public const TYPE_CUSTOM = 'custom';
 
-    public const VERIFICATION_DNS = 'dns_txt';
+    public const VERIFICATION_DNS = 'dns_cname';
 
     public function user(): BelongsTo
     {

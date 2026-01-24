@@ -15,7 +15,6 @@ use App\Http\Requests\Domains\VerifyDomainRequest;
 use App\Models\Domain;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -42,7 +41,7 @@ class DomainController extends Controller
             'type' => Domain::TYPE_CUSTOM,
             'status' => Domain::STATUS_PENDING,
             'verification_method' => Domain::VERIFICATION_DNS,
-            'verification_token' => Str::random(32),
+            'verification_token' => $this->verificationTarget(),
             'verified_at' => null,
         ]);
 
@@ -50,7 +49,7 @@ class DomainController extends Controller
 
         return to_route('domains.index')->with(
             'success',
-            'Domain added. Add the TXT record to verify ownership.',
+            'Domain added. Add the CNAME record to verify ownership.',
         );
     }
 
@@ -121,5 +120,16 @@ class DomainController extends Controller
         }
 
         return $domain;
+    }
+
+    private function verificationTarget(): string
+    {
+        $target = config('links.domain_verification_cname');
+
+        if (! is_string($target) || trim($target) === '') {
+            return parse_url(config('app.url'), PHP_URL_HOST) ?? '';
+        }
+
+        return trim($target);
     }
 }

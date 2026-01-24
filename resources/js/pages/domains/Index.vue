@@ -33,7 +33,7 @@ const statusVariant: Record<Domain['status'], 'default' | 'secondary' | 'outline
     disabled: 'default',
 };
 
-const recordName = (hostname: string) => `_shortlink.${hostname}`;
+const recordName = (hostname: string) => hostname;
 </script>
 
 <template>
@@ -61,7 +61,7 @@ const recordName = (hostname: string) => `_shortlink.${hostname}`;
                         <InputError :message="errors.hostname" />
                     </div>
                     <div class="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                        <span>Add the hostname you control. We'll give you a DNS TXT record.</span>
+                        <span>Add the hostname you control. We'll give you a DNS CNAME record.</span>
                     </div>
                     <div class="flex flex-wrap gap-3">
                         <Button type="submit" :disabled="processing">
@@ -91,18 +91,18 @@ const recordName = (hostname: string) => `_shortlink.${hostname}`;
 
                     <div v-if="domain.status === 'pending_verification'" class="mt-4 grid gap-3 text-sm">
                         <p class="text-muted-foreground">
-                            Add the TXT record below, then verify.
+                            Add the CNAME record below, then verify.
                         </p>
                         <div class="grid gap-2 rounded-xl border border-dashed border-border/70 p-4">
                             <div>
                                 <p class="text-xs font-semibold uppercase text-muted-foreground">
-                                    TXT record name
+                                    CNAME record name
                                 </p>
                                 <p class="font-medium">{{ recordName(domain.hostname) }}</p>
                             </div>
                             <div>
                                 <p class="text-xs font-semibold uppercase text-muted-foreground">
-                                    TXT record value
+                                    CNAME record value
                                 </p>
                                 <p class="font-mono text-xs">{{ domain.verification_token }}</p>
                             </div>

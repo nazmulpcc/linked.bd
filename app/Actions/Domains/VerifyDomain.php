@@ -8,25 +8,30 @@ class VerifyDomain
 {
     public function handle(Domain $domain): bool
     {
-        if ($domain->verification_method !== 'dns_txt' || ! $domain->verification_token) {
+        if ($domain->verification_method !== Domain::VERIFICATION_DNS || ! $domain->verification_token) {
             return false;
         }
 
-        $recordName = $domain->verificationRecordName();
-        $records = dns_get_record($recordName, DNS_TXT);
+        $recordName = $domain->hostname;
+        $records = dns_get_record($recordName, DNS_CNAME);
 
         if (! is_array($records)) {
             return false;
         }
 
         foreach ($records as $record) {
-            $value = $record['txt'] ?? $record['txtdata'] ?? null;
+            $value = $record['target'] ?? $record['cname'] ?? null;
 
-            if ($value && trim($value) === $domain->verification_token) {
+            if ($value && $this->normalizeCname($value) === $this->normalizeCname($domain->verification_token)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function normalizeCname(string $value): string
+    {
+        return rtrim(strtolower(trim($value)), '.');
     }
 }

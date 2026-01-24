@@ -6,6 +6,8 @@ use App\Models\Link;
 use App\Models\User;
 
 test('users can add a custom domain', function () {
+    config()->set('links.domain_verification_cname', 'verify.linked.test');
+
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post(route('domains.store'), [
@@ -20,7 +22,7 @@ test('users can add a custom domain', function () {
         ->not->toBeNull()
         ->and($domain->hostname)->toBe('go.example.com')
         ->and($domain->status)->toBe(Domain::STATUS_PENDING)
-        ->and($domain->verification_token)->not->toBeNull();
+        ->and($domain->verification_token)->toBe('verify.linked.test');
 });
 
 test('users cannot claim the platform hostname', function () {
