@@ -11,6 +11,7 @@ type LinkItem = {
     short_path: string | null;
     short_url: string;
     destination_url: string;
+    link_type: 'static' | 'dynamic';
     click_count: number;
     last_accessed_at: string | null;
     expires_at: string | null;
@@ -67,7 +68,15 @@ defineProps<{
                             <p class="text-xs font-semibold uppercase text-muted-foreground">
                                 Short link
                             </p>
-                            <p class="text-lg font-semibold">{{ link.short_url }}</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <p class="text-lg font-semibold">{{ link.short_url }}</p>
+                                <span
+                                    v-if="link.link_type === 'dynamic'"
+                                    class="rounded-full border border-border/70 px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                                >
+                                    Dynamic
+                                </span>
+                            </div>
                             <p class="text-sm text-muted-foreground">
                                 {{ link.destination_url }}
                             </p>

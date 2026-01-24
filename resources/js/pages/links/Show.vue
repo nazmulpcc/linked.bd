@@ -1,18 +1,37 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { index as linksIndex } from '@/routes/links';
-import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import DynamicRuleBuilder from '@/pages/links/components/DynamicRuleBuilder.vue';
+import { createCondition, createRule, type Rule, type RuleCondition } from '@/pages/links/components/dynamicTypes';
+import { dynamic, index as linksIndex, clone } from '@/routes/links';
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 type LinkSummary = {
     id: number;
     short_url: string;
     destination_url: string;
+    link_type: 'static' | 'dynamic';
+    fallback_destination_url: string | null;
     click_count: number;
     last_accessed_at: string | null;
     expires_at: string | null;
     domain: string | null;
+};
+
+type RuleConditionPayload = {
+    id: number;
+    condition_type: string | null;
+    operator: string | null;
+    value: string | string[] | Record<string, unknown> | null;
+};
+
+type RulePayload = {
+    id: number;
+    priority: number;
+    destination_url: string;
+    enabled: boolean;
+    conditions: RuleConditionPayload[];
 };
 
 type ChartPoint = {
@@ -32,6 +51,9 @@ type Analytics = {
 const props = defineProps<{
     link: LinkSummary;
     analytics: Analytics;
+    dynamic: {
+        rules: RulePayload[];
+    } | null;
 }>();
 
 const maxVisits = computed(() =>
@@ -40,6 +62,79 @@ const maxVisits = computed(() =>
 
 const formatDate = (value: string | null) =>
     value ? new Date(value).toLocaleString() : 'Never';
+
+const isDynamic = computed(() => props.link.link_type === 'dynamic');
+const isEditing = ref(false);
+const fallbackDestination = ref(props.link.fallback_destination_url ?? '');
+const rules = ref<Rule[]>([]);
+const selectClass =
+    'border-input text-foreground dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm';
+
+const mapRuleConditions = (conditions: RuleConditionPayload[]): RuleCondition[] =>
+    conditions.map((condition) => {
+        const draft = createCondition();
+        draft.condition_type = condition.condition_type ?? 'country';
+        draft.operator = condition.operator ?? 'equals';
+
+        if (draft.condition_type === 'time_window' && condition.value && typeof condition.value === 'object' && !Array.isArray(condition.value)) {
+            const value = condition.value as Record<string, unknown>;
+            draft.time = {
+                timezone: typeof value.timezone === 'string' ? value.timezone : '',
+                days: Array.isArray(value.days) ? (value.days as string[]) : [],
+                hours: {
+                    start: typeof value.hours === 'object' && value.hours !== null && typeof (value.hours as Record<string, unknown>).start === 'number'
+                        ? ((value.hours as Record<string, unknown>).start as number)
+                        : null,
+                    end: typeof value.hours === 'object' && value.hours !== null && typeof (value.hours as Record<string, unknown>).end === 'number'
+                        ? ((value.hours as Record<string, unknown>).end as number)
+                        : null,
+                },
+            };
+        } else if (Array.isArray(condition.value)) {
+            draft.values = condition.value as string[];
+        } else if (typeof condition.value === 'string') {
+            draft.value = condition.value;
+        }
+
+        return draft;
+    });
+
+const resetEditor = () => {
+    fallbackDestination.value = props.link.fallback_destination_url ?? '';
+    rules.value = (props.dynamic?.rules ?? []).map((rule, index) => ({
+        id: createRule(index + 1).id,
+        priority: rule.priority,
+        destination_url: rule.destination_url,
+        enabled: rule.enabled,
+        conditions: mapRuleConditions(rule.conditions),
+    }));
+};
+
+resetEditor();
+
+const formatConditionValue = (value: RuleConditionPayload['value']): string | null => {
+    if (value === null || value === undefined) {
+        return null;
+    }
+
+    if (Array.isArray(value)) {
+        return value.join(', ');
+    }
+
+    if (typeof value === 'object') {
+        const timezone = typeof value.timezone === 'string' ? value.timezone : '';
+        const days = Array.isArray(value.days) ? value.days.join(', ') : '';
+        const hours = typeof value.hours === 'object' && value.hours !== null
+            ? `${(value.hours as Record<string, unknown>).start ?? ''}-${(value.hours as Record<string, unknown>).end ?? ''}`
+            : '';
+
+        return [timezone && `tz: ${timezone}`, days && `days: ${days}`, hours && `hours: ${hours}`]
+            .filter(Boolean)
+            .join(' | ');
+    }
+
+    return String(value);
+};
 </script>
 
 <template>
@@ -57,10 +152,111 @@ const formatDate = (value: string | null) =>
                     {{ link.destination_url }}
                 </p>
             </div>
-            <Link :href="linksIndex()">
-                <Button variant="ghost" size="sm">Back to links</Button>
-            </Link>
+            <div class="flex flex-wrap items-center gap-2">
+                <Form v-bind="clone.form(link.ulid)">
+                    <Button variant="ghost" size="sm" type="submit">
+                        Clone link
+                    </Button>
+                </Form>
+                <Link :href="linksIndex()">
+                    <Button variant="ghost" size="sm">Back to links</Button>
+                </Link>
+            </div>
         </div>
+
+        <section
+            v-if="isDynamic"
+            class="mt-6 rounded-2xl border border-border/70 bg-card p-6"
+        >
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold">Dynamic routing rules</p>
+                    <p class="text-xs text-muted-foreground">
+                        Edit the destinations and conditions for this link.
+                    </p>
+                </div>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    @click="isEditing = !isEditing; if (!isEditing) resetEditor();"
+                >
+                    {{ isEditing ? 'Cancel' : 'Edit rules' }}
+                </Button>
+            </div>
+
+            <div v-if="!isEditing" class="mt-5 grid gap-4">
+                <div class="rounded-xl border border-border/70 bg-background p-4 text-sm">
+                    <p class="text-xs font-semibold uppercase text-muted-foreground">Fallback destination</p>
+                    <p class="mt-2 font-medium">
+                        {{ link.fallback_destination_url || link.destination_url }}
+                    </p>
+                </div>
+
+                <div class="grid gap-4">
+                    <div
+                        v-for="rule in dynamic?.rules || []"
+                        :key="rule.id"
+                        class="rounded-xl border border-border/70 bg-background p-4"
+                    >
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 text-sm font-semibold">
+                                <span>Rule</span>
+                                <span class="rounded-md border border-border/70 px-2 py-0.5 text-xs">
+                                    Priority {{ rule.priority }}
+                                </span>
+                            </div>
+                            <span
+                                class="text-xs"
+                                :class="rule.enabled ? 'text-emerald-500' : 'text-muted-foreground'"
+                            >
+                                {{ rule.enabled ? 'Enabled' : 'Disabled' }}
+                            </span>
+                        </div>
+                        <p class="mt-3 text-sm text-muted-foreground">Destination</p>
+                        <p class="text-sm font-medium">{{ rule.destination_url }}</p>
+
+                        <div class="mt-4 grid gap-2 text-xs text-muted-foreground">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                Conditions
+                            </p>
+                            <ul class="grid gap-1">
+                                <li
+                                    v-for="condition in rule.conditions"
+                                    :key="condition.id"
+                                >
+                                    {{ condition.condition_type }} ·
+                                    {{ condition.operator }}
+                                    <span v-if="formatConditionValue(condition.value)">
+                                        — {{ formatConditionValue(condition.value) }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <Form
+                v-else
+                v-bind="dynamic.update.form(link.ulid)"
+                v-slot="{ errors, processing }"
+                class="mt-6 grid gap-6"
+            >
+                <DynamicRuleBuilder
+                    v-model:fallbackDestination="fallbackDestination"
+                    v-model:rules="rules"
+                    :errors="errors"
+                    :selectClass="selectClass"
+                />
+
+                <div class="flex flex-wrap gap-3">
+                    <Button type="submit" :disabled="processing">
+                        {{ processing ? 'Saving...' : 'Save changes' }}
+                    </Button>
+                </div>
+            </Form>
+        </section>
 
         <div class="mt-6 grid gap-4 lg:grid-cols-3">
             <div class="rounded-2xl border border-border/70 bg-card p-6">

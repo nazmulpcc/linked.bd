@@ -39,6 +39,10 @@ Route::middleware(['auth', 'verified'])
         Route::get('/links', [LinkManagementController::class, 'index'])->name('links.index');
         Route::get('/links/{link:ulid}', [LinkManagementController::class, 'show'])
             ->name('links.show');
+        Route::patch('/links/{link:ulid}/dynamic', [LinkManagementController::class, 'updateDynamic'])
+            ->name('links.dynamic.update');
+        Route::post('/links/{link:ulid}/clone', [LinkManagementController::class, 'clone'])
+            ->name('links.clone');
         Route::delete('/links/{link:ulid}', [LinkManagementController::class, 'destroy'])
             ->name('links.destroy');
         Route::get('/links/{link:ulid}/qr', [LinkQrController::class, 'download'])
