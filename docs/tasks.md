@@ -266,32 +266,32 @@
     * [x] Avoid regex by default or restrict to safe patterns
   * [x] Acceptance: dynamic redirects select correct destination under multiple conditions without noticeable latency
 
-* [ ] 18. Dynamic link creation UI (separate form + rule builder)
+* [x] 18. Dynamic link creation UI (separate form + rule builder)
 
-  * [ ] Add link type selector in create flow: Static vs Dynamic
-  * [ ] For dynamic links, show dedicated UI:
+  * [x] Add link type selector in create flow: Static vs Dynamic
+  * [x] For dynamic links, show dedicated UI:
 
-    * [ ] Add rule button (creates a destination + conditions)
-    * [ ] Rule priority ordering (drag-drop or up/down)
-    * [ ] Destination URL input per rule
-    * [ ] Condition builder per rule:
+    * [x] Add rule button (creates a destination + conditions)
+    * [x] Rule priority ordering (drag-drop or up/down)
+    * [x] Destination URL input per rule
+    * [x] Condition builder per rule:
 
-      * [ ] Add condition row
-      * [ ] Select condition type
-      * [ ] Select operator (based on type)
-      * [ ] Input value(s) (single, multi-select, text)
-    * [ ] Fallback destination input (mandatory)
-  * [ ] Client-side validation for common errors:
+      * [x] Add condition row
+      * [x] Select condition type
+      * [x] Select operator (based on type)
+      * [x] Input value(s) (single, multi-select, text)
+    * [x] Fallback destination input (mandatory)
+  * [x] Client-side validation for common errors:
 
-    * [ ] Missing fallback
-    * [ ] Empty destination
-    * [ ] Invalid country code
-    * [ ] Duplicate priorities (if manual)
-  * [ ] Add UX features:
+    * [x] Missing fallback
+    * [x] Empty destination
+    * [x] Invalid country code
+    * [x] Duplicate priorities (if manual)
+  * [x] Add UX features:
 
-    * [ ] Rule templates (optional quick-add): “Mobile vs Desktop”, “Country split”, “Referrer split”
-    * [ ] Preview evaluation panel (optional): pick a simulated context and show resulting destination
-  * [ ] Acceptance: user can create a dynamic link with multiple rules and fallback from the UI
+    * [x] Rule templates (optional quick-add): “Mobile vs Desktop”, “Country split”, “Referrer split”
+    * [x] Preview evaluation panel (optional): pick a simulated context and show resulting destination
+  * [x] Acceptance: user can create a dynamic link with multiple rules and fallback from the UI
 
 * [x] 19. Dynamic link management UI (view/edit/clone)
 
