@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Links;
 
 use App\Enums\LinkType;
+use App\Events\LinkCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Links\DestroyLinkRequest;
 use App\Http\Requests\Links\UpdateDynamicLinkRequest;
@@ -319,6 +320,8 @@ class LinkManagementController extends Controller
 
             return $newLink;
         });
+
+        event(new LinkCreated($clone));
 
         return to_route('links.show', ['link' => $clone->ulid])
             ->with('success', 'Link cloned.');

@@ -1,10 +1,12 @@
 <?php
 
+use App\Jobs\GenerateQrForLink;
 use App\Models\Domain;
 use App\Models\Link;
 use App\Models\LinkRule;
 use App\Models\LinkRuleCondition;
 use App\Models\User;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -111,6 +113,8 @@ test('users can update dynamic link rules', function () {
 });
 
 test('users can clone dynamic links', function () {
+    Queue::fake();
+
     $user = User::factory()->create();
     $domain = Domain::factory()->platform()->create();
     $link = Link::factory()->for($domain)->for($user)->create([
@@ -138,4 +142,9 @@ test('users can clone dynamic links', function () {
     expect($clone->link_type->value)->toBe('dynamic')
         ->and($clone->fallback_destination_url)->toBe($link->fallback_destination_url)
         ->and($clone->rules)->toHaveCount(1);
+
+    Queue::assertPushed(
+        GenerateQrForLink::class,
+        fn (GenerateQrForLink $job) => $job->linkId === $clone->id,
+    );
 });
