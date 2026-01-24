@@ -56,12 +56,10 @@ defineProps<{
                 :key="link.id"
                 class="relative rounded-2xl border border-border/70 bg-card p-6"
             >
-                <a
-                    :href="link.short_url"
+                <Link
+                    :href="show(link.ulid)"
                     class="absolute inset-0 rounded-2xl"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                ></a>
+                ></Link>
                 <div class="relative z-10 pointer-events-none">
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div class="space-y-2">

@@ -293,23 +293,23 @@
     * [ ] Preview evaluation panel (optional): pick a simulated context and show resulting destination
   * [ ] Acceptance: user can create a dynamic link with multiple rules and fallback from the UI
 
-* [ ] 19. Dynamic link management UI (view/edit/clone)
+* [x] 19. Dynamic link management UI (view/edit/clone)
 
-  * [ ] Update links list to indicate link type (static/dynamic)
-  * [ ] Add link detail page (or modal) for dynamic links:
+  * [x] Update links list to indicate link type (static/dynamic)
+  * [x] Add link detail page (or modal) for dynamic links:
 
-    * [ ] Show ordered rules, conditions, and destinations
-    * [ ] Show fallback destination
-  * [ ] Implement edit flow for dynamic rules:
+    * [x] Show ordered rules, conditions, and destinations
+    * [x] Show fallback destination
+  * [x] Implement edit flow for dynamic rules:
 
-    * [ ] Add/remove rules
-    * [ ] Reorder rules
-    * [ ] Add/remove conditions
-    * [ ] Enable/disable specific rules
-  * [ ] Add “clone link” action (optional but useful):
+    * [x] Add/remove rules
+    * [x] Reorder rules
+    * [x] Add/remove conditions
+    * [x] Enable/disable specific rules
+  * [x] Add “clone link” action (optional but useful):
 
-    * [ ] Duplicates rule set for quick iteration
-  * [ ] Acceptance: dynamic links are editable safely and remain consistent after updates
+    * [x] Duplicates rule set for quick iteration
+  * [x] Acceptance: dynamic links are editable safely and remain consistent after updates
 
 * [ ] 20. Analytics integration for dynamic outcomes
 

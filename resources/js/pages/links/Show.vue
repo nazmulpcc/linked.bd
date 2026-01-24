@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DynamicRuleBuilder from '@/pages/links/components/DynamicRuleBuilder.vue';
 import { createCondition, createRule, type Rule, type RuleCondition } from '@/pages/links/components/dynamicTypes';
-import { dynamic, index as linksIndex, clone } from '@/routes/links';
+import links, { index as linksIndex } from '@/routes/links';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
@@ -153,7 +153,7 @@ const formatConditionValue = (value: RuleConditionPayload['value']): string | nu
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <Form v-bind="clone.form(link.ulid)">
+                <Form v-bind="links.clone.form(link.ulid)">
                     <Button variant="ghost" size="sm" type="submit">
                         Clone link
                     </Button>
@@ -239,7 +239,7 @@ const formatConditionValue = (value: RuleConditionPayload['value']): string | nu
 
             <Form
                 v-else
-                v-bind="dynamic.update.form(link.ulid)"
+                v-bind="links.dynamic.update.form(link.ulid)"
                 v-slot="{ errors, processing }"
                 class="mt-6 grid gap-6"
             >
