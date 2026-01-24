@@ -59,9 +59,16 @@ class DomainController extends Controller
     ): RedirectResponse {
         $verifier = app(VerifyDomain::class);
         $domain = $this->resolveDomainForUser($request, $domain);
+        $expectedTarget = $this->verificationTarget();
 
         if ($domain->status === Domain::STATUS_DISABLED) {
             return to_route('domains.index')->with('error', 'This domain is disabled.');
+        }
+
+        if ($domain->verification_token !== $expectedTarget) {
+            $domain->forceFill([
+                'verification_token' => $expectedTarget,
+            ])->save();
         }
 
         if ($verifier->handle($domain)) {

@@ -8,7 +8,13 @@ class VerifyDomain
 {
     public function handle(Domain $domain): bool
     {
-        if ($domain->verification_method !== Domain::VERIFICATION_DNS || ! $domain->verification_token) {
+        if ($domain->verification_method !== Domain::VERIFICATION_DNS) {
+            return false;
+        }
+
+        $expectedTarget = $this->expectedTarget();
+
+        if ($expectedTarget === '') {
             return false;
         }
 
@@ -22,12 +28,23 @@ class VerifyDomain
         foreach ($records as $record) {
             $value = $record['target'] ?? $record['cname'] ?? null;
 
-            if ($value && $this->normalizeCname($value) === $this->normalizeCname($domain->verification_token)) {
+            if ($value && $this->normalizeCname($value) === $this->normalizeCname($expectedTarget)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function expectedTarget(): string
+    {
+        $target = config('links.domain_verification_cname');
+
+        if (! is_string($target) || trim($target) === '') {
+            return parse_url(config('app.url'), PHP_URL_HOST) ?? '';
+        }
+
+        return trim($target);
     }
 
     private function normalizeCname(string $value): string
