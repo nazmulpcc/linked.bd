@@ -335,19 +335,19 @@
   * [x] Add feature flag/config to disable caching if troubleshooting
   * [x] Acceptance: dynamic evaluation avoids repeated DB queries under load
 
-* [ ] 22. Testing and verification scenarios (dynamic)
+* [x] 22. Testing and verification scenarios (dynamic)
 
-  * [ ] Define test matrix scenarios:
+  * [x] Define test matrix scenarios:
 
-    * [ ] Country + device combined (US + mobile → X, else → Y)
-    * [ ] Referrer present vs not present
-    * [ ] Browser split (Safari vs others)
-    * [ ] UTM campaign split
-    * [ ] Multiple rules where first match wins
-    * [ ] Disabled rule skipped
-    * [ ] No match uses fallback
+    * [x] Country + device combined (US + mobile → X, else → Y)
+    * [x] Referrer present vs not present
+    * [x] Browser split (Safari vs others)
+    * [x] UTM campaign split
+    * [x] Multiple rules where first match wins
+    * [x] Disabled rule skipped
+    * [x] No match uses fallback
   * [ ] Add UI-driven manual test checklist page (optional) for QA
-  * [ ] Acceptance: dynamic redirects behave correctly across defined scenarios
+  * [x] Acceptance: dynamic redirects behave correctly across defined scenarios
 
 * [ ] 23. Safety controls for dynamic rules
 

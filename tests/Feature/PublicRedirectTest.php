@@ -8,6 +8,41 @@ use App\Services\IpCountryResolver;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
 
+function dynamicDomain(string $hostname): Domain
+{
+    return Domain::factory()->platform()->create([
+        'hostname' => $hostname,
+    ]);
+}
+
+function dynamicLink(Domain $domain, string $code, string $fallback = 'https://example.com/fallback'): Link
+{
+    return Link::factory()->for($domain)->create([
+        'code' => $code,
+        'link_type' => 'dynamic',
+        'destination_url' => $fallback,
+        'fallback_destination_url' => $fallback,
+    ]);
+}
+
+function addRule(Link $link, int $priority, string $destination, bool $enabled = true): LinkRule
+{
+    return LinkRule::factory()->for($link)->create([
+        'priority' => $priority,
+        'destination_url' => $destination,
+        'enabled' => $enabled,
+    ]);
+}
+
+function addCondition(LinkRule $rule, string $type, string $operator, mixed $value = null): void
+{
+    LinkRuleCondition::factory()->for($rule, 'rule')->create([
+        'condition_type' => $type,
+        'operator' => $operator,
+        'value' => $value,
+    ]);
+}
+
 test('platform domain links resolve by code', function () {
     $domain = Domain::factory()->platform()->create([
         'hostname' => 'go.example.test',
@@ -162,27 +197,10 @@ test('dynamic links resolve matching rules before fallback', function () {
         }
     });
 
-    $domain = Domain::factory()->platform()->create([
-        'hostname' => 'dyn.example.test',
-    ]);
-    $link = Link::factory()->for($domain)->create([
-        'code' => 'dyn001',
-        'link_type' => 'dynamic',
-        'destination_url' => 'https://example.com/fallback',
-        'fallback_destination_url' => 'https://example.com/fallback',
-    ]);
-
-    $rule = LinkRule::factory()->for($link)->create([
-        'priority' => 1,
-        'destination_url' => 'https://example.com/us',
-        'enabled' => true,
-    ]);
-
-    LinkRuleCondition::factory()->for($rule, 'rule')->create([
-        'condition_type' => 'country',
-        'operator' => 'equals',
-        'value' => 'US',
-    ]);
+    $domain = dynamicDomain('dyn.example.test');
+    $link = dynamicLink($domain, 'dyn001');
+    $rule = addRule($link, 1, 'https://example.com/us');
+    addCondition($rule, 'country', 'equals', 'US');
 
     $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
 
@@ -198,29 +216,128 @@ test('dynamic links fall back when no rule matches', function () {
         }
     });
 
-    $domain = Domain::factory()->platform()->create([
-        'hostname' => 'dyn-fallback.example.test',
-    ]);
-    $link = Link::factory()->for($domain)->create([
-        'code' => 'dyn002',
-        'link_type' => 'dynamic',
-        'destination_url' => 'https://example.com/fallback',
-        'fallback_destination_url' => 'https://example.com/fallback',
-    ]);
-
-    $rule = LinkRule::factory()->for($link)->create([
-        'priority' => 1,
-        'destination_url' => 'https://example.com/us',
-        'enabled' => true,
-    ]);
-
-    LinkRuleCondition::factory()->for($rule, 'rule')->create([
-        'condition_type' => 'country',
-        'operator' => 'equals',
-        'value' => 'US',
-    ]);
+    $domain = dynamicDomain('dyn-fallback.example.test');
+    $link = dynamicLink($domain, 'dyn002');
+    $rule = addRule($link, 1, 'https://example.com/us');
+    addCondition($rule, 'country', 'equals', 'US');
 
     $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
 
     $response->assertRedirect('https://example.com/fallback');
+});
+
+test('dynamic rules match country and device together', function () {
+    app()->instance(IpCountryResolver::class, new class extends IpCountryResolver
+    {
+        public function resolve(string $ip): ?string
+        {
+            return 'US';
+        }
+    });
+
+    $domain = dynamicDomain('dyn-device.example.test');
+    $link = dynamicLink($domain, 'dyn003');
+    $rule = addRule($link, 1, 'https://example.com/mobile-us');
+    addCondition($rule, 'country', 'equals', 'US');
+    addCondition($rule, 'device_type', 'equals', 'mobile');
+
+    $response = $this
+        ->withHeader('User-Agent', 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)')
+        ->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/mobile-us');
+});
+
+test('dynamic rules can match browser splits', function () {
+    $domain = dynamicDomain('dyn-browser.example.test');
+    $link = dynamicLink($domain, 'dyn004');
+    $rule = addRule($link, 1, 'https://example.com/safari');
+    addCondition($rule, 'browser', 'equals', 'safari');
+
+    $response = $this
+        ->withHeader('User-Agent', 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Mobile/15E148 Safari/604.1')
+        ->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/safari');
+});
+
+test('dynamic rules can match utm campaigns', function () {
+    $domain = dynamicDomain('dyn-utm.example.test');
+    $link = dynamicLink($domain, 'dyn005');
+    $rule = addRule($link, 1, 'https://example.com/campaign');
+    addCondition($rule, 'utm_campaign', 'equals', 'spring-launch');
+
+    $response = $this->get(sprintf(
+        'http://%s/%s?utm_campaign=spring-launch',
+        $domain->hostname,
+        $link->code,
+    ));
+
+    $response->assertRedirect('https://example.com/campaign');
+});
+
+test('dynamic rules can match referrer presence', function () {
+    $domain = dynamicDomain('dyn-referrer.example.test');
+    $link = dynamicLink($domain, 'dyn006');
+    $rule = addRule($link, 1, 'https://example.com/referrer');
+    addCondition($rule, 'referrer_domain', 'exists');
+
+    $response = $this
+        ->withHeader('Referer', 'https://news.example/path')
+        ->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/referrer');
+});
+
+test('dynamic rules can match missing referrer', function () {
+    $domain = dynamicDomain('dyn-referrer-missing.example.test');
+    $link = dynamicLink($domain, 'dyn007');
+    $rule = addRule($link, 1, 'https://example.com/direct');
+    addCondition($rule, 'referrer_domain', 'not_exists');
+
+    $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/direct');
+});
+
+test('dynamic rules pick the first match by priority', function () {
+    app()->instance(IpCountryResolver::class, new class extends IpCountryResolver
+    {
+        public function resolve(string $ip): ?string
+        {
+            return 'US';
+        }
+    });
+
+    $domain = dynamicDomain('dyn-priority.example.test');
+    $link = dynamicLink($domain, 'dyn008');
+    $ruleOne = addRule($link, 1, 'https://example.com/first');
+    addCondition($ruleOne, 'country', 'equals', 'US');
+    $ruleTwo = addRule($link, 2, 'https://example.com/second');
+    addCondition($ruleTwo, 'country', 'equals', 'US');
+
+    $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/first');
+});
+
+test('dynamic rules skip disabled matches', function () {
+    app()->instance(IpCountryResolver::class, new class extends IpCountryResolver
+    {
+        public function resolve(string $ip): ?string
+        {
+            return 'US';
+        }
+    });
+
+    $domain = dynamicDomain('dyn-disabled.example.test');
+    $link = dynamicLink($domain, 'dyn009');
+    $ruleOne = addRule($link, 1, 'https://example.com/disabled', false);
+    addCondition($ruleOne, 'country', 'equals', 'US');
+    $ruleTwo = addRule($link, 2, 'https://example.com/enabled');
+    addCondition($ruleTwo, 'country', 'equals', 'US');
+
+    $response = $this->get(sprintf('http://%s/%s', $domain->hostname, $link->code));
+
+    $response->assertRedirect('https://example.com/enabled');
 });
