@@ -183,3 +183,182 @@
   * [x] Click count increments + last accessed updates
   * [x] Manual delete hard deletes and link stops working immediately
   * [x] Scheduled expiry/guest cleanup hard deletes and links stop working
+
+* [ ] 15. Dynamic redirect rules (data model + validation)
+
+  * [ ] Define “dynamic link” concept: a link can be either:
+
+    * [ ] Static (single destination_url)
+    * [ ] Dynamic (multiple destinations with ordered conditions + fallback)
+  * [ ] Extend `links` table to support dynamic mode flag/type and fallback destination (if not already present)
+  * [ ] Create `link_rules` table
+
+    * [ ] Fields: link_id, priority/order, destination_url, is_fallback (optional), enabled, timestamps
+  * [ ] Create `link_rule_conditions` table
+
+    * [ ] Fields: link_rule_id, condition_type, operator, value(s), timestamps
+  * [ ] Add indexes for fast evaluation:
+
+    * [ ] link_rules by link_id + priority
+    * [ ] link_rule_conditions by link_rule_id + condition_type
+  * [ ] Validation policies:
+
+    * [ ] Only http/https destinations
+    * [ ] At least one rule + exactly one fallback for dynamic links
+    * [ ] Rule priorities must be unique per link (or auto-normalized)
+    * [ ] Limit maximum rules per link (configurable) to keep evaluation fast
+    * [ ] Limit maximum conditions per rule (configurable)
+  * [ ] Acceptance: dynamic link schema supports multiple destinations, ordered evaluation, and fallback
+
+* [ ] 16. Condition system (supported signals + operators)
+
+  * [ ] Define supported condition types (day-one):
+
+    * [ ] Country (ISO code)
+    * [ ] Device type (mobile/desktop/tablet)
+    * [ ] OS (iOS/Android/Windows/macOS/Linux)
+    * [ ] Browser (Chrome/Safari/Firefox/Edge/Other)
+    * [ ] Referrer domain (exact / contains)
+    * [ ] Referrer path (contains / prefix)
+    * [ ] UTM source/medium/campaign (from query params)
+    * [ ] Language/locale (Accept-Language prefix)
+    * [ ] Time window (optional): day-of-week and/or hour range in a specified timezone
+  * [ ] Define operators per condition type:
+
+    * [ ] equals / not equals
+    * [ ] in list / not in list
+    * [ ] contains / not contains
+    * [ ] starts_with / ends_with (referrer/path)
+    * [ ] regex (optional; if included, restrict to referrer/path and guard complexity)
+    * [ ] exists / not exists (e.g., referrer present)
+  * [ ] Define normalization rules:
+
+    * [ ] Country stored/evaluated using ISO-3166-1 alpha-2
+    * [ ] Device/OS/Browser as enums
+    * [ ] Referrer parsed into scheme/host/path/query; store only the parts needed for matching
+  * [ ] Define evaluation semantics:
+
+    * [ ] AND within a rule (all conditions must match)
+    * [ ] Rules evaluated by ascending priority; first match wins
+    * [ ] Fallback rule always present and used if no match
+  * [ ] Acceptance: condition types and operators are consistent, validated, and predictable
+
+* [ ] 17. Redirect runtime evaluation (fast path)
+
+  * [ ] Implement a “request context” builder for redirect requests:
+
+    * [ ] Country (from existing detection pipeline)
+    * [ ] Device/OS/Browser (from User-Agent parsing)
+    * [ ] Referrer (from headers, parsed)
+    * [ ] UTM params (from query string)
+    * [ ] Language/locale (Accept-Language)
+    * [ ] Timestamp and day-of-week (optional)
+  * [ ] Implement dynamic rule resolver:
+
+    * [ ] Loads rules + conditions for a link efficiently (minimal queries; cached if feasible)
+    * [ ] Evaluates in priority order, returns destination_url
+    * [ ] Falls back when no rule matches
+  * [ ] Ensure password protection still applies before redirect resolution (if link protected)
+  * [ ] Ensure expiry/deleted logic still blocks redirect before evaluation
+  * [ ] Add guardrails to keep redirect fast:
+
+    * [ ] Hard caps on number of rules/conditions evaluated
+    * [ ] Avoid regex by default or restrict to safe patterns
+  * [ ] Acceptance: dynamic redirects select correct destination under multiple conditions without noticeable latency
+
+* [ ] 18. Dynamic link creation UI (separate form + rule builder)
+
+  * [ ] Add link type selector in create flow: Static vs Dynamic
+  * [ ] For dynamic links, show dedicated UI:
+
+    * [ ] Add rule button (creates a destination + conditions)
+    * [ ] Rule priority ordering (drag-drop or up/down)
+    * [ ] Destination URL input per rule
+    * [ ] Condition builder per rule:
+
+      * [ ] Add condition row
+      * [ ] Select condition type
+      * [ ] Select operator (based on type)
+      * [ ] Input value(s) (single, multi-select, text)
+    * [ ] Fallback destination input (mandatory)
+  * [ ] Client-side validation for common errors:
+
+    * [ ] Missing fallback
+    * [ ] Empty destination
+    * [ ] Invalid country code
+    * [ ] Duplicate priorities (if manual)
+  * [ ] Add UX features:
+
+    * [ ] Rule templates (optional quick-add): “Mobile vs Desktop”, “Country split”, “Referrer split”
+    * [ ] Preview evaluation panel (optional): pick a simulated context and show resulting destination
+  * [ ] Acceptance: user can create a dynamic link with multiple rules and fallback from the UI
+
+* [ ] 19. Dynamic link management UI (view/edit/clone)
+
+  * [ ] Update links list to indicate link type (static/dynamic)
+  * [ ] Add link detail page (or modal) for dynamic links:
+
+    * [ ] Show ordered rules, conditions, and destinations
+    * [ ] Show fallback destination
+  * [ ] Implement edit flow for dynamic rules:
+
+    * [ ] Add/remove rules
+    * [ ] Reorder rules
+    * [ ] Add/remove conditions
+    * [ ] Enable/disable specific rules
+  * [ ] Add “clone link” action (optional but useful):
+
+    * [ ] Duplicates rule set for quick iteration
+  * [ ] Acceptance: dynamic links are editable safely and remain consistent after updates
+
+* [ ] 20. Analytics integration for dynamic outcomes
+
+  * [ ] Extend click analytics payload to include:
+
+    * [ ] Resolved rule_id (or “fallback”)
+    * [ ] Resolved destination_url (optional; store only if needed)
+  * [ ] Update analytics worker/job to record:
+
+    * [ ] Click counts per link (existing)
+    * [ ] Click counts per rule (new aggregation)
+  * [ ] Add dashboard view for dynamic analytics:
+
+    * [ ] Per rule clicks
+    * [ ] Fallback clicks
+  * [ ] Acceptance: user can see which rule is being selected and how often
+
+* [ ] 21. Caching and performance optimization (dynamic rules)
+
+  * [ ] Add caching strategy for rule sets per link (e.g., cache key by link_id + updated_at)
+  * [ ] Invalidate cache when rules/conditions change
+  * [ ] Ensure cache is host-aware where needed (domain+slug resolution remains correct)
+  * [ ] Add feature flag/config to disable caching if troubleshooting
+  * [ ] Acceptance: dynamic evaluation avoids repeated DB queries under load
+
+* [ ] 22. Testing and verification scenarios (dynamic)
+
+  * [ ] Define test matrix scenarios:
+
+    * [ ] Country + device combined (US + mobile → X, else → Y)
+    * [ ] Referrer present vs not present
+    * [ ] Browser split (Safari vs others)
+    * [ ] UTM campaign split
+    * [ ] Multiple rules where first match wins
+    * [ ] Disabled rule skipped
+    * [ ] No match uses fallback
+  * [ ] Add UI-driven manual test checklist page (optional) for QA
+  * [ ] Acceptance: dynamic redirects behave correctly across defined scenarios
+
+* [ ] 23. Safety controls for dynamic rules
+
+  * [ ] Enforce limits (configurable):
+
+    * [ ] max rules per link
+    * [ ] max conditions per rule
+    * [ ] max total conditions per link
+  * [ ] Validate and normalize referrer matching inputs (domain parsing, trim, lowercase)
+  * [ ] If regex is supported:
+
+    * [ ] Restrict to referrer/path only
+    * [ ] Add max length and reject catastrophic patterns (or disable regex entirely for v1)
+  * [ ] Acceptance: dynamic feature cannot degrade redirect performance or be abused easily
