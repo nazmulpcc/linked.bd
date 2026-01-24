@@ -40,10 +40,10 @@ class RedirectController extends Controller
         }
 
         if (! $link->password_hash) {
-            $destinationUrl = $this->resolveDestination($request, $link);
-            $this->recordClick($request, $link);
+            $resolution = $this->resolveDestination($request, $link);
+            $this->recordClick($request, $link, $resolution['rule_id'], $resolution['destination_url']);
 
-            return redirect()->away($destinationUrl);
+            return redirect()->away($resolution['destination_url']);
         }
 
         return Inertia::render('links/Password', [
@@ -76,10 +76,10 @@ class RedirectController extends Controller
         }
 
         if (! $link->password_hash) {
-            $destinationUrl = $this->resolveDestination($request, $link);
-            $this->recordClick($request, $link);
+            $resolution = $this->resolveDestination($request, $link);
+            $this->recordClick($request, $link, $resolution['rule_id'], $resolution['destination_url']);
 
-            return Inertia::location($destinationUrl);
+            return Inertia::location($resolution['destination_url']);
         }
 
         $key = $this->throttleKey($request, $slug);
@@ -104,10 +104,10 @@ class RedirectController extends Controller
 
         RateLimiter::clear($key);
 
-        $destinationUrl = $this->resolveDestination($request, $link);
-        $this->recordClick($request, $link);
+        $resolution = $this->resolveDestination($request, $link);
+        $this->recordClick($request, $link, $resolution['rule_id'], $resolution['destination_url']);
 
-        return Inertia::location($destinationUrl);
+        return Inertia::location($resolution['destination_url']);
     }
 
     private function resolveDomain(Request $request): ?Domain
@@ -144,9 +144,13 @@ class RedirectController extends Controller
         );
     }
 
-    private function recordClick(Request $request, Link $link): void
-    {
-        $visitData = $this->visitData($request);
+    private function recordClick(
+        Request $request,
+        Link $link,
+        ?int $ruleId,
+        ?string $resolvedDestinationUrl,
+    ): void {
+        $visitData = $this->visitData($request, $ruleId, $resolvedDestinationUrl);
 
         try {
             RecordLinkClick::dispatch($link->id, $visitData);
@@ -170,10 +174,13 @@ class RedirectController extends Controller
     }
 
     /**
-     * @return array{visited_at: string, referrer_host: string|null, device_type: string|null, browser: string|null, country_code: string|null, user_agent: string|null}
+     * @return array{visited_at: string, referrer_host: string|null, device_type: string|null, browser: string|null, country_code: string|null, user_agent: string|null, link_rule_id: int|null, resolved_destination_url: string|null}
      */
-    private function visitData(Request $request): array
-    {
+    private function visitData(
+        Request $request,
+        ?int $ruleId,
+        ?string $resolvedDestinationUrl,
+    ): array {
         $userAgent = $request->userAgent();
         $referrer = $request->headers->get('referer');
         $referrerHost = null;
@@ -192,6 +199,8 @@ class RedirectController extends Controller
             'device_type' => $this->deviceType($userAgent),
             'browser' => $this->browserName($userAgent),
             'country_code' => $this->countryCode($request),
+            'link_rule_id' => $ruleId,
+            'resolved_destination_url' => $resolvedDestinationUrl,
             'user_agent' => $userAgent,
         ];
     }
@@ -249,8 +258,11 @@ class RedirectController extends Controller
         return app(IpCountryResolver::class)->resolve($ip);
     }
 
-    private function resolveDestination(Request $request, Link $link): string
+    /**
+     * @return array{destination_url: string, rule_id: int|null}
+     */
+    private function resolveDestination(Request $request, Link $link): array
     {
-        return app(LinkRedirectResolver::class)->resolve($link, $request);
+        return app(LinkRedirectResolver::class)->resolveWithRule($link, $request);
     }
 }

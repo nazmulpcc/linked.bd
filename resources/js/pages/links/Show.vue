@@ -39,6 +39,14 @@ type ChartPoint = {
     value: number;
 };
 
+type RuleAnalytics = {
+    id: number;
+    priority: number;
+    destination_url: string;
+    enabled: boolean;
+    clicks: number;
+};
+
 type Analytics = {
     total_visits: number;
     visits_by_day: ChartPoint[];
@@ -46,6 +54,8 @@ type Analytics = {
     device_breakdown: ChartPoint[];
     browser_breakdown: ChartPoint[];
     country_breakdown: ChartPoint[];
+    rule_breakdown: RuleAnalytics[];
+    fallback_clicks: number | null;
 };
 
 const props = defineProps<{
@@ -256,6 +266,58 @@ const formatConditionValue = (value: RuleConditionPayload['value']): string | nu
                     </Button>
                 </div>
             </Form>
+        </section>
+
+        <section
+            v-if="isDynamic"
+            class="mt-6 rounded-2xl border border-border/70 bg-card p-6"
+        >
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold">Dynamic rule performance</p>
+                    <p class="text-xs text-muted-foreground">
+                        See which rules are winning and how often fallback is used.
+                    </p>
+                </div>
+            </div>
+
+            <div v-if="analytics.rule_breakdown.length" class="mt-5 grid gap-3">
+                <div
+                    v-for="rule in analytics.rule_breakdown"
+                    :key="rule.id"
+                    class="rounded-xl border border-border/70 bg-background p-4 text-sm"
+                >
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="rounded-md border border-border/70 px-2 py-0.5 text-xs">
+                                Priority {{ rule.priority }}
+                            </span>
+                            <span
+                                class="text-xs"
+                                :class="rule.enabled ? 'text-emerald-500' : 'text-muted-foreground'"
+                            >
+                                {{ rule.enabled ? 'Enabled' : 'Disabled' }}
+                            </span>
+                        </div>
+                        <span class="text-sm font-semibold">{{ rule.clicks }}</span>
+                    </div>
+                    <p class="mt-2 text-xs text-muted-foreground">Destination</p>
+                    <p class="text-sm font-medium">{{ rule.destination_url }}</p>
+                </div>
+            </div>
+            <p v-else class="mt-5 text-sm text-muted-foreground">
+                No dynamic rule clicks yet.
+            </p>
+
+            <div class="mt-4 rounded-xl border border-border/70 bg-background p-4 text-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-muted-foreground">Fallback clicks</span>
+                    <span class="font-semibold">{{ analytics.fallback_clicks ?? 0 }}</span>
+                </div>
+                <p class="mt-2 text-xs text-muted-foreground">
+                    Used when no rules match or when a rule is disabled.
+                </p>
+            </div>
         </section>
 
         <div class="mt-6 grid gap-4 lg:grid-cols-3">

@@ -124,6 +124,31 @@ class LinkManagementController extends Controller
             ])
             ->all();
 
+        $ruleBreakdown = [];
+        $fallbackClicks = null;
+
+        if ($link->link_type === LinkType::Dynamic) {
+            $ruleClicks = (clone $visitQuery)
+                ->selectRaw('link_rule_id, COUNT(*) as total')
+                ->groupBy('link_rule_id')
+                ->get()
+                ->keyBy('link_rule_id');
+
+            $ruleBreakdown = $link->rules
+                ->sortBy('priority')
+                ->values()
+                ->map(fn (LinkRule $rule) => [
+                    'id' => $rule->id,
+                    'priority' => $rule->priority,
+                    'destination_url' => $rule->destination_url,
+                    'enabled' => $rule->enabled,
+                    'clicks' => (int) ($ruleClicks->get($rule->id)->total ?? 0),
+                ])
+                ->all();
+
+            $fallbackClicks = (clone $visitQuery)->whereNull('link_rule_id')->count();
+        }
+
         return Inertia::render('links/Show', [
             'link' => [
                 'id' => $link->id,
@@ -164,6 +189,8 @@ class LinkManagementController extends Controller
                 'device_breakdown' => $deviceBreakdown,
                 'browser_breakdown' => $browserBreakdown,
                 'country_breakdown' => $countryBreakdown,
+                'rule_breakdown' => $ruleBreakdown,
+                'fallback_clicks' => $fallbackClicks,
             ],
         ]);
     }

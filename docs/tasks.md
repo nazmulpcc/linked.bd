@@ -311,21 +311,21 @@
     * [x] Duplicates rule set for quick iteration
   * [x] Acceptance: dynamic links are editable safely and remain consistent after updates
 
-* [ ] 20. Analytics integration for dynamic outcomes
+* [x] 20. Analytics integration for dynamic outcomes
 
-  * [ ] Extend click analytics payload to include:
+  * [x] Extend click analytics payload to include:
 
-    * [ ] Resolved rule_id (or “fallback”)
-    * [ ] Resolved destination_url (optional; store only if needed)
-  * [ ] Update analytics worker/job to record:
+    * [x] Resolved rule_id (or “fallback”)
+    * [x] Resolved destination_url (optional; store only if needed)
+  * [x] Update analytics worker/job to record:
 
-    * [ ] Click counts per link (existing)
-    * [ ] Click counts per rule (new aggregation)
-  * [ ] Add dashboard view for dynamic analytics:
+    * [x] Click counts per link (existing)
+    * [x] Click counts per rule (new aggregation)
+  * [x] Add dashboard view for dynamic analytics:
 
-    * [ ] Per rule clicks
-    * [ ] Fallback clicks
-  * [ ] Acceptance: user can see which rule is being selected and how often
+    * [x] Per rule clicks
+    * [x] Fallback clicks
+  * [x] Acceptance: user can see which rule is being selected and how often
 
 * [ ] 21. Caching and performance optimization (dynamic rules)
 

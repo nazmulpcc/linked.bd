@@ -3,6 +3,7 @@
 use App\Jobs\RecordLinkClick;
 use App\Models\Domain;
 use App\Models\Link;
+use App\Models\LinkRule;
 use App\Models\LinkVisit;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -38,6 +39,8 @@ test('users can view analytics for their links', function () {
         ->has('analytics.device_breakdown')
         ->has('analytics.browser_breakdown')
         ->has('analytics.country_breakdown')
+        ->has('analytics.rule_breakdown')
+        ->where('analytics.fallback_clicks', null)
     );
 });
 
@@ -53,6 +56,8 @@ test('recording link visits stores analytics data', function () {
         'device_type' => 'desktop',
         'browser' => 'firefox',
         'country_code' => 'GB',
+        'link_rule_id' => null,
+        'resolved_destination_url' => 'https://example.com/promo',
         'user_agent' => 'Mozilla/5.0',
     ];
 
@@ -70,5 +75,47 @@ test('recording link visits stores analytics data', function () {
         ->and($visit->device_type)->toBe('desktop')
         ->and($visit->browser)->toBe('firefox')
         ->and($visit->country_code)->toBe('GB')
+        ->and($visit->resolved_destination_url)->toBe('https://example.com/promo')
         ->and($visit->user_agent)->toBe('Mozilla/5.0');
+});
+
+test('dynamic analytics include rule and fallback click counts', function () {
+    $user = User::factory()->create();
+    $domain = Domain::factory()->platform()->create();
+    $link = Link::factory()->for($domain)->for($user)->create([
+        'link_type' => 'dynamic',
+        'fallback_destination_url' => 'https://example.com/fallback',
+    ]);
+
+    $ruleOne = LinkRule::factory()->for($link)->create([
+        'priority' => 1,
+        'destination_url' => 'https://example.com/one',
+    ]);
+    $ruleTwo = LinkRule::factory()->for($link)->create([
+        'priority' => 2,
+        'destination_url' => 'https://example.com/two',
+    ]);
+
+    LinkVisit::factory()->for($link)->create([
+        'link_rule_id' => $ruleOne->id,
+    ]);
+    LinkVisit::factory()->for($link)->create([
+        'link_rule_id' => $ruleOne->id,
+    ]);
+    LinkVisit::factory()->for($link)->create([
+        'link_rule_id' => $ruleTwo->id,
+    ]);
+    LinkVisit::factory()->for($link)->create([
+        'link_rule_id' => null,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('links.show', $link));
+
+    $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('links/Show')
+        ->where('analytics.rule_breakdown.0.clicks', 2)
+        ->where('analytics.rule_breakdown.1.clicks', 1)
+        ->where('analytics.fallback_clicks', 1)
+    );
 });

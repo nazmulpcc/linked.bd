@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $link_id
+ * @property int|null $link_rule_id
  * @property string|null $referrer_host
  * @property string|null $device_type
  * @property string|null $browser
  * @property string|null $country_code
+ * @property string|null $resolved_destination_url
  * @property string|null $user_agent
  * @property \Illuminate\Support\Carbon $visited_at
  * @property \Illuminate\Support\Carbon|null $created_at

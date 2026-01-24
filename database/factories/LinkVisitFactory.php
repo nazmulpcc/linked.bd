@@ -19,11 +19,13 @@ class LinkVisitFactory extends Factory
     {
         return [
             'link_id' => Link::factory(),
+            'link_rule_id' => null,
             'visited_at' => now(),
             'referrer_host' => fake()->optional()->domainName(),
             'device_type' => fake()->randomElement(['mobile', 'desktop']),
             'browser' => fake()->randomElement(['chrome', 'safari', 'firefox', 'edge']),
             'country_code' => fake()->optional()->countryCode(),
+            'resolved_destination_url' => fake()->optional()->url(),
             'user_agent' => fake()->userAgent(),
         ];
     }

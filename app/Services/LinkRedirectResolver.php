@@ -19,15 +19,26 @@ class LinkRedirectResolver
 {
     public function __construct(private IpCountryResolver $ipCountryResolver) {}
 
-    public function resolve(Link $link, Request $request): string
+    /**
+     * @return array{destination_url: string, rule_id: int|null}
+     */
+    public function resolveWithRule(Link $link, Request $request): array
     {
         if ($link->link_type !== LinkType::Dynamic) {
-            return $link->destination_url;
+            return [
+                'destination_url' => $link->destination_url,
+                'rule_id' => null,
+            ];
         }
 
         $context = $this->buildContext($request);
 
         return $this->resolveDynamic($link, $context);
+    }
+
+    public function resolve(Link $link, Request $request): string
+    {
+        return $this->resolveWithRule($link, $request)['destination_url'];
     }
 
     /**
@@ -72,7 +83,11 @@ class LinkRedirectResolver
         ];
     }
 
-    private function resolveDynamic(Link $link, array $context): string
+    /**
+     * @param  array<string, mixed>  $context
+     * @return array{destination_url: string, rule_id: int|null}
+     */
+    private function resolveDynamic(Link $link, array $context): array
     {
         $fallback = $link->fallback_destination_url ?? $link->destination_url;
         $maxRules = (int) config('links.dynamic.max_rules');
@@ -102,11 +117,17 @@ class LinkRedirectResolver
             }
 
             if ($this->ruleMatches($rule, $conditions->all(), $context)) {
-                return $rule->destination_url;
+                return [
+                    'destination_url' => $rule->destination_url,
+                    'rule_id' => $rule->id,
+                ];
             }
         }
 
-        return $fallback;
+        return [
+            'destination_url' => $fallback,
+            'rule_id' => null,
+        ];
     }
 
     /**
