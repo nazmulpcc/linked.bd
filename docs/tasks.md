@@ -184,64 +184,64 @@
   * [x] Manual delete hard deletes and link stops working immediately
   * [x] Scheduled expiry/guest cleanup hard deletes and links stop working
 
-* [ ] 15. Dynamic redirect rules (data model + validation)
+* [x] 15. Dynamic redirect rules (data model + validation)
 
-  * [ ] Define “dynamic link” concept: a link can be either:
+  * [x] Define “dynamic link” concept: a link can be either:
 
-    * [ ] Static (single destination_url)
-    * [ ] Dynamic (multiple destinations with ordered conditions + fallback)
-  * [ ] Extend `links` table to support dynamic mode flag/type and fallback destination (if not already present)
-  * [ ] Create `link_rules` table
+    * [x] Static (single destination_url)
+    * [x] Dynamic (multiple destinations with ordered conditions + fallback)
+  * [x] Extend `links` table to support dynamic mode flag/type and fallback destination (if not already present)
+  * [x] Create `link_rules` table
 
-    * [ ] Fields: link_id, priority/order, destination_url, is_fallback (optional), enabled, timestamps
-  * [ ] Create `link_rule_conditions` table
+    * [x] Fields: link_id, priority/order, destination_url, is_fallback (optional), enabled, timestamps
+  * [x] Create `link_rule_conditions` table
 
-    * [ ] Fields: link_rule_id, condition_type, operator, value(s), timestamps
-  * [ ] Add indexes for fast evaluation:
+    * [x] Fields: link_rule_id, condition_type, operator, value(s), timestamps
+  * [x] Add indexes for fast evaluation:
 
-    * [ ] link_rules by link_id + priority
-    * [ ] link_rule_conditions by link_rule_id + condition_type
-  * [ ] Validation policies:
+    * [x] link_rules by link_id + priority
+    * [x] link_rule_conditions by link_rule_id + condition_type
+  * [x] Validation policies:
 
-    * [ ] Only http/https destinations
-    * [ ] At least one rule + exactly one fallback for dynamic links
-    * [ ] Rule priorities must be unique per link (or auto-normalized)
-    * [ ] Limit maximum rules per link (configurable) to keep evaluation fast
-    * [ ] Limit maximum conditions per rule (configurable)
-  * [ ] Acceptance: dynamic link schema supports multiple destinations, ordered evaluation, and fallback
+    * [x] Only http/https destinations
+    * [x] At least one rule + exactly one fallback for dynamic links
+    * [x] Rule priorities must be unique per link (or auto-normalized)
+    * [x] Limit maximum rules per link (configurable) to keep evaluation fast
+    * [x] Limit maximum conditions per rule (configurable)
+  * [x] Acceptance: dynamic link schema supports multiple destinations, ordered evaluation, and fallback
 
-* [ ] 16. Condition system (supported signals + operators)
+* [x] 16. Condition system (supported signals + operators)
 
-  * [ ] Define supported condition types (day-one):
+  * [x] Define supported condition types (day-one):
 
-    * [ ] Country (ISO code)
-    * [ ] Device type (mobile/desktop/tablet)
-    * [ ] OS (iOS/Android/Windows/macOS/Linux)
-    * [ ] Browser (Chrome/Safari/Firefox/Edge/Other)
-    * [ ] Referrer domain (exact / contains)
-    * [ ] Referrer path (contains / prefix)
-    * [ ] UTM source/medium/campaign (from query params)
-    * [ ] Language/locale (Accept-Language prefix)
-    * [ ] Time window (optional): day-of-week and/or hour range in a specified timezone
-  * [ ] Define operators per condition type:
+    * [x] Country (ISO code)
+    * [x] Device type (mobile/desktop/tablet)
+    * [x] OS (iOS/Android/Windows/macOS/Linux)
+    * [x] Browser (Chrome/Safari/Firefox/Edge/Other)
+    * [x] Referrer domain (exact / contains)
+    * [x] Referrer path (contains / prefix)
+    * [x] UTM source/medium/campaign (from query params)
+    * [x] Language/locale (Accept-Language prefix)
+    * [x] Time window (optional): day-of-week and/or hour range in a specified timezone
+  * [x] Define operators per condition type:
 
-    * [ ] equals / not equals
-    * [ ] in list / not in list
-    * [ ] contains / not contains
-    * [ ] starts_with / ends_with (referrer/path)
-    * [ ] regex (optional; if included, restrict to referrer/path and guard complexity)
-    * [ ] exists / not exists (e.g., referrer present)
-  * [ ] Define normalization rules:
+    * [x] equals / not equals
+    * [x] in list / not in list
+    * [x] contains / not contains
+    * [x] starts_with / ends_with (referrer/path)
+    * [x] regex (optional; if included, restrict to referrer/path and guard complexity)
+    * [x] exists / not exists (e.g., referrer present)
+  * [x] Define normalization rules:
 
-    * [ ] Country stored/evaluated using ISO-3166-1 alpha-2
-    * [ ] Device/OS/Browser as enums
-    * [ ] Referrer parsed into scheme/host/path/query; store only the parts needed for matching
-  * [ ] Define evaluation semantics:
+    * [x] Country stored/evaluated using ISO-3166-1 alpha-2
+    * [x] Device/OS/Browser as enums
+    * [x] Referrer parsed into scheme/host/path/query; store only the parts needed for matching
+  * [x] Define evaluation semantics:
 
-    * [ ] AND within a rule (all conditions must match)
-    * [ ] Rules evaluated by ascending priority; first match wins
-    * [ ] Fallback rule always present and used if no match
-  * [ ] Acceptance: condition types and operators are consistent, validated, and predictable
+    * [x] AND within a rule (all conditions must match)
+    * [x] Rules evaluated by ascending priority; first match wins
+    * [x] Fallback rule always present and used if no match
+  * [x] Acceptance: condition types and operators are consistent, validated, and predictable
 
 * [ ] 17. Redirect runtime evaluation (fast path)
 
