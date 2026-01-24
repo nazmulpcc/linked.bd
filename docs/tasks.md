@@ -243,28 +243,28 @@
     * [x] Fallback rule always present and used if no match
   * [x] Acceptance: condition types and operators are consistent, validated, and predictable
 
-* [ ] 17. Redirect runtime evaluation (fast path)
+* [x] 17. Redirect runtime evaluation (fast path)
 
-  * [ ] Implement a “request context” builder for redirect requests:
+  * [x] Implement a “request context” builder for redirect requests:
 
-    * [ ] Country (from existing detection pipeline)
-    * [ ] Device/OS/Browser (from User-Agent parsing)
-    * [ ] Referrer (from headers, parsed)
-    * [ ] UTM params (from query string)
-    * [ ] Language/locale (Accept-Language)
-    * [ ] Timestamp and day-of-week (optional)
-  * [ ] Implement dynamic rule resolver:
+    * [x] Country (from existing detection pipeline)
+    * [x] Device/OS/Browser (from User-Agent parsing)
+    * [x] Referrer (from headers, parsed)
+    * [x] UTM params (from query string)
+    * [x] Language/locale (Accept-Language)
+    * [x] Timestamp and day-of-week (optional)
+  * [x] Implement dynamic rule resolver:
 
-    * [ ] Loads rules + conditions for a link efficiently (minimal queries; cached if feasible)
-    * [ ] Evaluates in priority order, returns destination_url
-    * [ ] Falls back when no rule matches
-  * [ ] Ensure password protection still applies before redirect resolution (if link protected)
-  * [ ] Ensure expiry/deleted logic still blocks redirect before evaluation
-  * [ ] Add guardrails to keep redirect fast:
+    * [x] Loads rules + conditions for a link efficiently (minimal queries; cached if feasible)
+    * [x] Evaluates in priority order, returns destination_url
+    * [x] Falls back when no rule matches
+  * [x] Ensure password protection still applies before redirect resolution (if link protected)
+  * [x] Ensure expiry/deleted logic still blocks redirect before evaluation
+  * [x] Add guardrails to keep redirect fast:
 
-    * [ ] Hard caps on number of rules/conditions evaluated
-    * [ ] Avoid regex by default or restrict to safe patterns
-  * [ ] Acceptance: dynamic redirects select correct destination under multiple conditions without noticeable latency
+    * [x] Hard caps on number of rules/conditions evaluated
+    * [x] Avoid regex by default or restrict to safe patterns
+  * [x] Acceptance: dynamic redirects select correct destination under multiple conditions without noticeable latency
 
 * [ ] 18. Dynamic link creation UI (separate form + rule builder)
 
