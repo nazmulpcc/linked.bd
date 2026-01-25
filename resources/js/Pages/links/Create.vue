@@ -11,6 +11,7 @@ type Domain = {
     id: number;
     hostname: string;
     type: 'platform' | 'custom';
+    redirection_id: number | null;
 };
 
 const props = defineProps<{

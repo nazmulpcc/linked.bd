@@ -4,12 +4,13 @@ import TurnstileWidget from '@/components/TurnstileWidget.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 type Domain = {
     id: number;
     hostname: string;
     type: 'platform' | 'custom';
+    redirection_id: number | null;
 };
 
 const props = defineProps<{
@@ -33,12 +34,23 @@ const showPassword = defineModel<boolean>('showPassword', {
 const showExpiry = defineModel<boolean>('showExpiry', {
     required: true,
 });
+const rootRedirect = defineModel<boolean>('rootRedirect', {
+    required: true,
+});
 
 const selectedDomain = computed(() =>
     props.domains.find((domain) => String(domain.id) === selectedDomainId.value),
 );
 const isCustomDomain = computed(() => selectedDomain.value?.type === 'custom');
+const hasRootRedirect = computed(() => selectedDomain.value?.redirection_id !== null);
 const hasSingleDomain = computed(() => props.domains.length === 1);
+const canSetRootRedirect = computed(() => isCustomDomain.value && !hasRootRedirect.value);
+
+watch([isCustomDomain, hasRootRedirect], () => {
+    if (!canSetRootRedirect.value && rootRedirect.value) {
+        rootRedirect.value = false;
+    }
+});
 </script>
 
 <template>
@@ -59,6 +71,12 @@ const hasSingleDomain = computed(() => props.domains.length === 1);
         type="hidden"
         name="domain_id"
         :value="selectedDomainId"
+    >
+    <input
+        v-if="rootRedirect && !showAdvanced"
+        type="hidden"
+        name="root_redirect"
+        value="1"
     >
 
     <div class="grid gap-3">
@@ -108,7 +126,24 @@ const hasSingleDomain = computed(() => props.domains.length === 1);
             </select>
         </div>
 
-        <div v-if="isCustomDomain" class="grid gap-2">
+        <div v-if="canSetRootRedirect" class="grid gap-2">
+            <label class="flex items-center gap-3 text-sm">
+                <input
+                    v-model="rootRedirect"
+                    type="checkbox"
+                    name="root_redirect"
+                    value="1"
+                    class="size-4 rounded border-input"
+                >
+                Root domain redirection
+            </label>
+            <p class="text-xs text-muted-foreground">
+                Send visitors who hit the root domain to this link.
+            </p>
+            <InputError :message="errors.root_redirect" />
+        </div>
+
+        <div v-if="isCustomDomain && !rootRedirect" class="grid gap-2">
             <Label for="alias">Custom alias (optional)</Label>
             <Input
                 id="alias"

@@ -64,6 +64,10 @@ class StoreLinkRequest extends FormRequest
                 'integer',
                 Rule::exists('domains', 'id'),
             ],
+            'root_redirect' => [
+                'nullable',
+                'boolean',
+            ],
             'alias' => [
                 'nullable',
                 'string',

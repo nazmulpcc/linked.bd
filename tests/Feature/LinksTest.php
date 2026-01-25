@@ -139,6 +139,54 @@ test('authenticated users can create custom domain links with aliases', function
         ->and($link->domain_id)->toBe($domain->id);
 });
 
+test('custom domain root redirects update the domain redirection', function () {
+    $user = User::factory()->create();
+    $domain = Domain::factory()->for($user)->verified()->create();
+
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
+        'destination_url' => 'https://example.com',
+        'domain_id' => $domain->id,
+        'root_redirect' => true,
+    ]));
+
+    $response->assertRedirectContains('/links/success/');
+
+    $domain->refresh();
+    $link = Link::query()->firstOrFail();
+
+    expect($domain->redirection_id)->toBe($link->id)
+        ->and($link->alias)->toBeNull();
+});
+
+test('root redirects are only available on custom domains', function () {
+    $user = User::factory()->create();
+    $domain = Domain::factory()->platform()->create();
+
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
+        'destination_url' => 'https://example.com',
+        'domain_id' => $domain->id,
+        'root_redirect' => true,
+    ]));
+
+    $response->assertSessionHasErrors('root_redirect');
+});
+
+test('root redirects cannot override existing root redirects', function () {
+    $user = User::factory()->create();
+    $domain = Domain::factory()->for($user)->verified()->create();
+    $existing = Link::factory()->for($domain)->create();
+
+    $domain->forceFill(['redirection_id' => $existing->id])->save();
+
+    $response = $this->actingAs($user)->post(route('links.store'), withTurnstile([
+        'destination_url' => 'https://example.com',
+        'domain_id' => $domain->id,
+        'root_redirect' => true,
+    ]));
+
+    $response->assertSessionHasErrors('root_redirect');
+});
+
 test('custom domains must be verified', function () {
     $user = User::factory()->create();
     $domain = Domain::factory()->for($user)->create([

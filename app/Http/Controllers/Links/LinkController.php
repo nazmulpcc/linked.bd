@@ -12,6 +12,7 @@ use App\Models\LinkAccessToken;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -36,7 +37,7 @@ class LinkController extends Controller
             })
             ->orderBy('type')
             ->orderBy('hostname')
-            ->get(['id', 'hostname', 'type']);
+            ->get(['id', 'hostname', 'type', 'redirection_id']);
 
         return Inertia::render('links/Create', [
             'domains' => $domains,
@@ -50,7 +51,24 @@ class LinkController extends Controller
     {
         $linkType = LinkType::tryFrom($request->string('link_type')->toString()) ?? LinkType::Static;
         $domain = $this->resolveDomainForCreate($request);
+        $isRootRedirect = $request->boolean('root_redirect');
         $alias = $this->normalizeAlias($request->string('alias')->toString());
+
+        if ($isRootRedirect) {
+            if ($domain->type !== Domain::TYPE_CUSTOM) {
+                throw ValidationException::withMessages([
+                    'root_redirect' => 'Root domain redirects are only available on custom domains.',
+                ]);
+            }
+
+            if ($domain->redirection_id !== null) {
+                throw ValidationException::withMessages([
+                    'root_redirect' => 'This domain already has a root redirect.',
+                ]);
+            }
+
+            $alias = null;
+        }
 
         if ($domain->type === Domain::TYPE_PLATFORM && $alias !== null) {
             throw ValidationException::withMessages([
@@ -73,24 +91,44 @@ class LinkController extends Controller
             $destinationUrl = $fallbackDestination;
         }
 
-        $link = Link::query()->create([
-            'domain_id' => $domain->id,
-            'user_id' => optional($request->user())->id,
-            'code' => $code,
-            'alias' => $alias,
-            'link_type' => $linkType,
-            'destination_url' => $destinationUrl,
-            'fallback_destination_url' => $fallbackDestination,
-            'password_hash' => $this->hashPassword($request->string('password')->toString()),
-            'expires_at' => $expiresAt,
-            'click_count' => 0,
-            'last_accessed_at' => null,
-            'qr_path' => null,
-        ]);
+        $link = DB::transaction(function () use (
+            $request,
+            $domain,
+            $code,
+            $alias,
+            $linkType,
+            $destinationUrl,
+            $fallbackDestination,
+            $expiresAt,
+            $isRootRedirect,
+        ): Link {
+            $link = Link::query()->create([
+                'domain_id' => $domain->id,
+                'user_id' => optional($request->user())->id,
+                'code' => $code,
+                'alias' => $alias,
+                'link_type' => $linkType,
+                'destination_url' => $destinationUrl,
+                'fallback_destination_url' => $fallbackDestination,
+                'password_hash' => $this->hashPassword($request->string('password')->toString()),
+                'expires_at' => $expiresAt,
+                'click_count' => 0,
+                'last_accessed_at' => null,
+                'qr_path' => null,
+            ]);
 
-        if ($linkType === LinkType::Dynamic) {
-            $this->storeDynamicRules($request, $link);
-        }
+            if ($linkType === LinkType::Dynamic) {
+                $this->storeDynamicRules($request, $link);
+            }
+
+            if ($isRootRedirect) {
+                $domain->forceFill([
+                    'redirection_id' => $link->id,
+                ])->save();
+            }
+
+            return $link;
+        });
 
         event(new LinkCreated($link));
 

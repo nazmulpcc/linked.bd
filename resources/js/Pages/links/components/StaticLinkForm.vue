@@ -9,6 +9,7 @@ type Domain = {
     id: number;
     hostname: string;
     type: 'platform' | 'custom';
+    redirection_id: number | null;
 };
 
 const props = defineProps<{
@@ -25,6 +26,7 @@ const selectedDomainId = ref(
 const showAdvanced = ref(false);
 const showPassword = ref(false);
 const showExpiry = ref(false);
+const rootRedirect = ref(false);
 </script>
 
 <template>
@@ -41,6 +43,7 @@ const showExpiry = ref(false);
             v-model:showAdvanced="showAdvanced"
             v-model:showPassword="showPassword"
             v-model:showExpiry="showExpiry"
+            v-model:rootRedirect="rootRedirect"
             :domains="domains"
             :errors="errors"
             :guestTtlDays="guestTtlDays"

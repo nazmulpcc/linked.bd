@@ -8,6 +8,7 @@ use App\Http\Controllers\Links\LinkController;
 use App\Http\Controllers\Links\LinkManagementController;
 use App\Http\Controllers\Links\LinkQrController;
 use App\Http\Controllers\Links\RedirectController;
+use App\Http\Middleware\RedirectRootDomain;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -17,7 +18,9 @@ Route::middleware('web')->group(function () {
         return Inertia::render('Welcome', [
             'canRegister' => Features::enabled(Features::registration()),
         ]);
-    })->name('home');
+    })
+        ->middleware(RedirectRootDomain::class)
+        ->name('home');
 
     Route::get('/create', [LinkController::class, 'create'])->name('links.create');
     Route::post('/links', [LinkController::class, 'store'])

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property int $id
  * @property int|null $user_id
+ * @property int|null $redirection_id
  * @property string $hostname
  * @property string $type
  * @property string $status
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \App\Models\Link|null $redirection
  */
 class Domain extends Model
 {
@@ -44,6 +46,11 @@ class Domain extends Model
     public function links(): HasMany
     {
         return $this->hasMany(Link::class);
+    }
+
+    public function redirection(): BelongsTo
+    {
+        return $this->belongsTo(Link::class, 'redirection_id');
     }
 
     public function verificationRecordName(): string
