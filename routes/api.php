@@ -37,6 +37,7 @@ Route::prefix('v1')
 
                 Route::middleware('abilities:domains:write')->group(function (): void {
                     Route::post('/', [DomainsController::class, 'store'])->name('store');
+                    Route::post('/{domain}/disable', [DomainsController::class, 'disable'])->name('disable');
                     Route::delete('/{domain}', [DomainsController::class, 'destroy'])->name('destroy');
                     Route::post('/{domain}/verify', [DomainsController::class, 'verify'])->name('verify');
                 });

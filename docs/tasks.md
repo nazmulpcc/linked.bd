@@ -391,26 +391,26 @@
   * [x] Ensure only token owner can manage tokens
   * [x] Acceptance: user can create/revoke tokens and use them for API calls
 
-* [ ] 26. API endpoints: links/domains/QR parity with UI
+* [x] 26. API endpoints: links/domains/QR parity with UI
 
-  * [ ] Implement Links API
+  * [x] Implement Links API
 
-    * [ ] Create static link
-    * [ ] Create dynamic link (if dynamic rules are enabled)
-    * [ ] List links (pagination + filters minimal)
-    * [ ] Delete link
-    * [ ] Get link details (include QR status/url)
-  * [ ] Implement Domains API
+    * [x] Create static link
+    * [x] Create dynamic link (if dynamic rules are enabled)
+    * [x] List links (pagination + filters minimal)
+    * [x] Delete link
+    * [x] Get link details (include QR status/url)
+  * [x] Implement Domains API
 
-    * [ ] Create domain (pending)
-    * [ ] List domains
-    * [ ] Verify domain
-    * [ ] Disable/delete domain (policy-consistent)
-  * [ ] Implement QR API
+    * [x] Create domain (pending)
+    * [x] List domains
+    * [x] Verify domain
+    * [x] Disable/delete domain (policy-consistent)
+  * [x] Implement QR API
 
-    * [ ] Get QR metadata/status
-    * [ ] Download QR (or return signed URL)
-  * [ ] Acceptance: API supports all required operations with scope enforcement
+    * [x] Get QR metadata/status
+    * [x] Download QR (or return signed URL)
+  * [x] Acceptance: API supports all required operations with scope enforcement
 
 * [ ] 27. Bulk shorten UX (dashboard)
 

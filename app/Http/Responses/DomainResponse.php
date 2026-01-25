@@ -23,6 +23,7 @@ class DomainResponse extends ApiResponse
             'verification_method' => $domain->verification_method,
             'verified_at' => optional($domain->verified_at)->toIso8601String(),
             'created_at' => optional($domain->created_at)->toIso8601String(),
+            'links_count' => $domain->relationLoaded('links') ? $domain->links->count() : $domain->links_count,
         ];
     }
 }
