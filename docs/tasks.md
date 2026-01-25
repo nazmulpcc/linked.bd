@@ -362,3 +362,186 @@
     * [x] Restrict to referrer/path only
     * [x] Add max length and reject catastrophic patterns (or disable regex entirely for v1)
   * [x] Acceptance: dynamic feature cannot degrade redirect performance or be abused easily
+
+* [ ] 24. API foundations (Sanctum) and access scope
+
+  * [ ] Define API surface for v1 (endpoints required)
+
+    * [ ] Links: create, list, delete, get details
+    * [ ] QR: download (or get URL)
+    * [ ] Domains: create, list, delete/disable, verify, get details
+    * [ ] Bulk import: create job, job status, job items list
+  * [ ] Install/configure Laravel Sanctum for token auth
+  * [ ] Define token abilities/scopes (minimum set)
+
+    * [ ] links:read, links:write
+    * [ ] domains:read, domains:write
+    * [ ] bulk:read, bulk:write
+  * [ ] Implement API auth middleware and consistent error format
+  * [ ] Acceptance: authenticated API requests work using personal access tokens and scopes
+
+* [ ] 25. API token management UI (dashboard)
+
+  * [ ] Create UI page: API Tokens
+
+    * [ ] List tokens (name, created_at, last_used_at, scopes)
+    * [ ] Create token (name + scopes selection)
+    * [ ] Revoke token
+  * [ ] One-time token display on creation (copy UX + warning)
+  * [ ] Ensure only token owner can manage tokens
+  * [ ] Acceptance: user can create/revoke tokens and use them for API calls
+
+* [ ] 26. API endpoints: links/domains/QR parity with UI
+
+  * [ ] Implement Links API
+
+    * [ ] Create static link
+    * [ ] Create dynamic link (if dynamic rules are enabled)
+    * [ ] List links (pagination + filters minimal)
+    * [ ] Delete link
+    * [ ] Get link details (include QR status/url)
+  * [ ] Implement Domains API
+
+    * [ ] Create domain (pending)
+    * [ ] List domains
+    * [ ] Verify domain
+    * [ ] Disable/delete domain (policy-consistent)
+  * [ ] Implement QR API
+
+    * [ ] Get QR metadata/status
+    * [ ] Download QR (or return signed URL)
+  * [ ] Acceptance: API supports all required operations with scope enforcement
+
+* [ ] 27. Bulk shorten UX (dashboard)
+
+  * [ ] Add “Bulk Shorten” entry point in dashboard
+  * [ ] Build bulk shorten form:
+
+    * [ ] Large textarea; one URL per line
+    * [ ] Domain selector (platform + verified custom domains)
+    * [ ] Optional defaults: password, expiry (apply to all or disabled for bulk v1)
+    * [ ] Validation summary: count lines, show invalid lines, deduplicate option
+  * [ ] Add “Start Bulk Shorten” action that creates a bulk import job and redirects to job page
+  * [ ] Acceptance: user can paste many URLs, submit, and be redirected to a job page
+
+* [ ] 28. Bulk import job model (DB) and lifecycle
+
+  * [ ] Create `bulk_import_jobs` table
+
+    * [ ] Fields: id, user_id, domain_id, status, total_count, processed_count, success_count, failed_count, started_at, finished_at, timestamps
+  * [ ] Create `bulk_import_items` table
+
+    * [ ] Fields: job_id, row_number, source_url, status, link_id nullable, error_message nullable, qr_status, timestamps
+  * [ ] Define job statuses:
+
+    * [ ] pending, running, completed, completed_with_errors, failed, cancelled (optional)
+  * [ ] Define item statuses:
+
+    * [ ] queued, processing, succeeded, failed
+  * [ ] Acceptance: a submitted bulk request produces a job and items rows representing each input line
+
+* [ ] 29. Bulk processing pipeline (queues + idempotency)
+
+  * [ ] Create job dispatch flow:
+
+    * [ ] Upon bulk submission, enqueue a “ProcessBulkImportJob” (or chunked jobs)
+  * [ ] Implement processing strategy:
+
+    * [ ] Parse + normalize URLs
+    * [ ] Validate scheme and safety rules
+    * [ ] Create link (code/alias rules same as normal create)
+    * [ ] Enqueue QR generation per created link (existing worker)
+    * [ ] Update item row with short URL/link_id and status
+    * [ ] Update aggregate counters on bulk_import_jobs
+  * [ ] Chunking/backpressure:
+
+    * [ ] Process items in batches to avoid long-running single jobs
+    * [ ] Ensure retries do not duplicate links (idempotent handling per item)
+  * [ ] Failure handling:
+
+    * [ ] Record error_message per item
+    * [ ] Continue processing other items
+    * [ ] Finalize job status correctly
+  * [ ] Acceptance: bulk jobs reliably process large inputs without timeouts; failures are per-row
+
+* [ ] 30. Bulk job page UI (real-time updates)
+
+  * [ ] Create bulk job detail page:
+
+    * [ ] Job header: status, counts, progress indicator
+    * [ ] Table: one row per item with columns:
+
+      * [ ] Row number
+      * [ ] Long URL
+      * [ ] Short URL (when ready)
+      * [ ] QR status / QR preview (when ready)
+      * [ ] Error (if failed)
+  * [ ] Implement “live updates” transport:
+
+    * [ ] Option A: polling endpoint (simple day-one)
+    * [ ] Option B: websockets/broadcasting (only if already present)
+  * [ ] Implement incremental UI update behavior:
+
+    * [ ] Refresh changed rows only
+    * [ ] Show “QR generating” until QR ready
+  * [ ] Add actions:
+
+    * [ ] Download QR for a row (when ready)
+    * [ ] Copy short URL
+    * [ ] Export results (CSV) (optional but high value)
+  * [ ] Acceptance: job page updates as links/QRs are generated; user sees progress in near real-time
+
+* [ ] 31. Bulk jobs list and navigation
+
+  * [ ] Create “Bulk Imports” list page:
+
+    * [ ] Show recent jobs, status, counts, created_at
+    * [ ] Link to job detail
+  * [ ] Add dashboard navigation entry
+  * [ ] Acceptance: user can find past bulk jobs and open their status pages
+
+* [ ] 32. Bulk import API endpoints
+
+  * [ ] Create Bulk Job API
+
+    * [ ] Create job with list of URLs (array or newline string)
+    * [ ] Get job status (counts + status)
+    * [ ] List job items (paginated)
+  * [ ] Enforce scopes: bulk:read / bulk:write
+  * [ ] Acceptance: bulk import can be driven entirely via API
+
+* [ ] 33. API documentation (OpenAPI) and docs page
+
+  * [ ] Decide docs approach:
+
+    * [ ] OpenAPI spec file maintained in repo
+    * [ ] UI renderer (Swagger UI / Redoc) served at a docs route
+  * [ ] Implement docs page (authenticated or public—choose one; default: authenticated)
+  * [ ] Document authentication:
+
+    * [ ] How to create token
+    * [ ] How to pass token (Authorization header)
+    * [ ] Scopes/abilities
+  * [ ] Document key endpoints with request/response schemas:
+
+    * [ ] Links, Domains, QR, Bulk Jobs
+  * [ ] Keep docs aligned with API behavior (versioning note)
+  * [ ] Acceptance: user can view API docs and successfully call endpoints using described auth
+
+* [ ] 34. Permissions, consistency, and UX polish for bulk + API
+
+  * [ ] Ensure ownership enforcement across:
+
+    * [ ] Links created by bulk job
+    * [ ] Bulk job visibility
+    * [ ] QR downloads
+  * [ ] Add rate limits:
+
+    * [ ] Bulk submission per user/token
+    * [ ] API calls per token (basic)
+  * [ ] Add clear UI empty/error states:
+
+    * [ ] Bulk validation errors (invalid lines)
+    * [ ] Job failed/cancelled states
+    * [ ] Token creation/revocation confirmations
+  * [ ] Acceptance: bulk + API features are safe, consistent, and user-friendly
