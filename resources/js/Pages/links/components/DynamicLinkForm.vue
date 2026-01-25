@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import DynamicLinkFields from '@/Pages/links/components/DynamicLinkFields.vue';
 import { createRule, type Rule } from '@/Pages/links/components/dynamicTypes';
-import LinkController from '@/actions/App/Http/Controllers/Links/LinkController';
+import { store } from '@/routes/links';
 import { Form } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -32,7 +32,8 @@ const rules = ref<Rule[]>([createRule(1)]);
 
 <template>
     <Form
-        v-bind="LinkController.store.form()"
+        :action="store().url"
+        method="post"
         v-slot="{ errors, processing }"
         class="grid gap-6"
     >

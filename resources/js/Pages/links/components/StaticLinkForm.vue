@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import StaticLinkFields from '@/Pages/links/components/StaticLinkFields.vue';
-import LinkController from '@/actions/App/Http/Controllers/Links/LinkController';
+import { store } from '@/routes/links';
 import { Form } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -29,7 +29,8 @@ const showExpiry = ref(false);
 
 <template>
     <Form
-        v-bind="LinkController.store.form()"
+        :action="store().url"
+        method="post"
         v-slot="{ errors, processing }"
         class="grid gap-6"
     >
