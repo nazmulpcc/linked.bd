@@ -342,7 +342,7 @@ endpoints:
         name: 'rules[].enabled'
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -365,7 +365,7 @@ endpoints:
         name: 'rules[].conditions[].condition_type'
         description: ''
         required: true
-        example: referrer_path
+        example: utm_medium
         type: string
         enumValues:
           - country
@@ -387,7 +387,7 @@ endpoints:
         name: 'rules[].conditions[].operator'
         description: ''
         required: true
-        example: not_equals
+        example: regex
         type: string
         enumValues:
           - equals
@@ -427,11 +427,11 @@ endpoints:
         -
           priority: 22
           destination_url: 'http://crooks.biz/et-fugiat-sunt-nihil-accusantium'
-          enabled: false
+          enabled: true
           conditions:
             -
-              condition_type: referrer_path
-              operator: not_equals
+              condition_type: utm_medium
+              operator: regex
     fileParameters: []
     responses: []
     responseFields: []
@@ -962,7 +962,7 @@ endpoints:
         name: deduplicate
         description: ''
         required: false
-        example: true
+        example: false
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -973,7 +973,7 @@ endpoints:
       domain_id: 16
       password: ']|{+-0pBNvYg'
       expires_at: '2052-02-19'
-      deduplicate: true
+      deduplicate: false
     fileParameters: []
     responses: []
     responseFields: []

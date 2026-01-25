@@ -776,11 +776,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
         {
             \"priority\": 22,
             \"destination_url\": \"http:\\/\\/crooks.biz\\/et-fugiat-sunt-nihil-accusantium\",
-            \"enabled\": false,
+            \"enabled\": true,
             \"conditions\": [
                 {
-                    \"condition_type\": \"referrer_path\",
-                    \"operator\": \"not_equals\"
+                    \"condition_type\": \"utm_medium\",
+                    \"operator\": \"regex\"
                 }
             ]
         }
@@ -812,11 +812,11 @@ let body = {
         {
             "priority": 22,
             "destination_url": "http:\/\/crooks.biz\/et-fugiat-sunt-nihil-accusantium",
-            "enabled": false,
+            "enabled": true,
             "conditions": [
                 {
-                    "condition_type": "referrer_path",
-                    "operator": "not_equals"
+                    "condition_type": "utm_medium",
+                    "operator": "regex"
                 }
             ]
         }
@@ -1057,7 +1057,7 @@ Must be one of:
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
                     </div>
                                                                 <div style=" margin-left: 14px; clear: unset;">
         <details>
@@ -1076,10 +1076,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="rules.0.conditions.0.condition_type"                data-endpoint="POSTapi-v1-links"
-               value="referrer_path"
+               value="utm_medium"
                data-component="body">
     <br>
-<p>Example: <code>referrer_path</code></p>
+<p>Example: <code>utm_medium</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>country</code></li> <li><code>device_type</code></li> <li><code>operating_system</code></li> <li><code>browser</code></li> <li><code>referrer_domain</code></li> <li><code>referrer_path</code></li> <li><code>utm_source</code></li> <li><code>utm_medium</code></li> <li><code>utm_campaign</code></li> <li><code>language</code></li> <li><code>time_window</code></li></ul>
                     </div>
@@ -1090,10 +1090,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="rules.0.conditions.0.operator"                data-endpoint="POSTapi-v1-links"
-               value="not_equals"
+               value="regex"
                data-component="body">
     <br>
-<p>Example: <code>not_equals</code></p>
+<p>Example: <code>regex</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>equals</code></li> <li><code>not_equals</code></li> <li><code>in</code></li> <li><code>not_in</code></li> <li><code>contains</code></li> <li><code>not_contains</code></li> <li><code>starts_with</code></li> <li><code>ends_with</code></li> <li><code>regex</code></li> <li><code>exists</code></li> <li><code>not_exists</code></li></ul>
                     </div>
@@ -2444,7 +2444,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"domain_id\": 16,
     \"password\": \"]|{+-0pBNvYg\",
     \"expires_at\": \"2052-02-19\",
-    \"deduplicate\": true
+    \"deduplicate\": false
 }"
 </code></pre></div>
 
@@ -2465,7 +2465,7 @@ let body = {
     "domain_id": 16,
     "password": "]|{+-0pBNvYg",
     "expires_at": "2052-02-19",
-    "deduplicate": true
+    "deduplicate": false
 };
 
 fetch(url, {
@@ -2630,7 +2630,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 
