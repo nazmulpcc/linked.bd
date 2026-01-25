@@ -363,22 +363,22 @@
     * [x] Add max length and reject catastrophic patterns (or disable regex entirely for v1)
   * [x] Acceptance: dynamic feature cannot degrade redirect performance or be abused easily
 
-* [ ] 24. API foundations (Sanctum) and access scope
+* [x] 24. API foundations (Sanctum) and access scope
 
-  * [ ] Define API surface for v1 (endpoints required)
+  * [x] Define API surface for v1 (endpoints required)
 
-    * [ ] Links: create, list, delete, get details
-    * [ ] QR: download (or get URL)
-    * [ ] Domains: create, list, delete/disable, verify, get details
-    * [ ] Bulk import: create job, job status, job items list
-  * [ ] Install/configure Laravel Sanctum for token auth
-  * [ ] Define token abilities/scopes (minimum set)
+    * [x] Links: create, list, delete, get details
+    * [x] QR: download (or get URL)
+    * [x] Domains: create, list, delete/disable, verify, get details
+    * [x] Bulk import: create job, job status, job items list
+  * [x] Install/configure Laravel Sanctum for token auth
+  * [x] Define token abilities/scopes (minimum set)
 
-    * [ ] links:read, links:write
-    * [ ] domains:read, domains:write
-    * [ ] bulk:read, bulk:write
-  * [ ] Implement API auth middleware and consistent error format
-  * [ ] Acceptance: authenticated API requests work using personal access tokens and scopes
+    * [x] links:read, links:write
+    * [x] domains:read, domains:write
+    * [x] bulk:read, bulk:write
+  * [x] Implement API auth middleware and consistent error format
+  * [x] Acceptance: authenticated API requests work using personal access tokens and scopes
 
 * [ ] 25. API token management UI (dashboard)
 
