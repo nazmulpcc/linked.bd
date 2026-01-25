@@ -127,7 +127,7 @@ const recordName = (hostname: string) => hostname;
                     <div class="mt-6 flex flex-wrap gap-2">
                         <Form
                             v-if="domain.status === 'pending_verification'"
-                            v-bind="verify(domain.id)"
+                            v-bind="verify.form(domain.id)"
                             v-slot="{ processing }"
                         >
                             <Button type="submit" size="sm" :disabled="processing">
