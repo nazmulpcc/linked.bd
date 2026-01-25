@@ -4,11 +4,11 @@ namespace App\Http\Controllers\BulkImports;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BulkImports\StoreBulkImportRequest;
+use App\Models\BulkImportItem;
+use App\Models\BulkImportJob;
 use App\Models\Domain;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -47,35 +47,60 @@ class BulkImportController extends Controller
             ]);
         }
 
-        $jobId = (string) Str::ulid();
-
-        Cache::put("bulk-imports:{$jobId}", [
-            'id' => $jobId,
+        $job = BulkImportJob::query()->create([
+            'user_id' => $request->user()->id,
             'domain_id' => $domain->id,
-            'total' => count($urls),
-            'status' => 'pending',
-            'created_at' => now()->toIso8601String(),
-            'deduplicate' => $request->boolean('deduplicate'),
-            'defaults' => [
-                'password' => $request->string('password')->toString(),
-                'expires_at' => $request->input('expires_at'),
-            ],
-        ], now()->addMinutes(30));
+            'status' => BulkImportJob::STATUS_PENDING,
+            'total_count' => count($urls),
+            'processed_count' => 0,
+            'success_count' => 0,
+            'failed_count' => 0,
+            'started_at' => null,
+            'finished_at' => null,
+        ]);
 
-        return to_route('bulk-imports.show', ['job' => $jobId])
+        $items = [];
+
+        foreach ($urls as $index => $url) {
+            $items[] = [
+                'job_id' => $job->id,
+                'row_number' => $index + 1,
+                'source_url' => $url,
+                'status' => BulkImportItem::STATUS_QUEUED,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        BulkImportItem::query()->insert($items);
+
+        return to_route('bulk-imports.show', ['job' => $job->id])
             ->with('success', 'Bulk import started.');
     }
 
     public function show(Request $request, string $job): Response
     {
-        $payload = Cache::get("bulk-imports:{$job}");
+        $payload = BulkImportJob::query()
+            ->where('id', $job)
+            ->where('user_id', $request->user()->id)
+            ->first();
 
-        if (! is_array($payload)) {
+        if (! $payload) {
             abort(404);
         }
 
         return Inertia::render('bulk/Show', [
-            'job' => $payload,
+            'job' => [
+                'id' => $payload->id,
+                'status' => $payload->status,
+                'total_count' => $payload->total_count,
+                'processed_count' => $payload->processed_count,
+                'success_count' => $payload->success_count,
+                'failed_count' => $payload->failed_count,
+                'created_at' => optional($payload->created_at)->toIso8601String(),
+                'started_at' => optional($payload->started_at)->toIso8601String(),
+                'finished_at' => optional($payload->finished_at)->toIso8601String(),
+            ],
         ]);
     }
 

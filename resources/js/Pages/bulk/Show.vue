@@ -8,10 +8,14 @@ import { Head, Link } from '@inertiajs/vue3';
 
 type Job = {
     id: string;
-    domain_id: number;
-    total: number;
     status: string;
+    total_count: number;
+    processed_count: number;
+    success_count: number;
+    failed_count: number;
     created_at: string;
+    started_at?: string | null;
+    finished_at?: string | null;
 };
 
 defineProps<{
@@ -52,12 +56,42 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
                 <div class="flex items-center justify-between">
                     <span>Total URLs</span>
-                    <span class="font-semibold">{{ job.total }}</span>
+                    <span class="font-semibold">{{ job.total_count }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>Processed</span>
+                    <span class="font-semibold">{{ job.processed_count }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>Succeeded</span>
+                    <span class="font-semibold">{{ job.success_count }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>Failed</span>
+                    <span class="font-semibold">{{ job.failed_count }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <span>Created at</span>
                     <span class="font-semibold">
                         {{ new Date(job.created_at).toLocaleString() }}
+                    </span>
+                </div>
+                <div
+                    v-if="job.started_at"
+                    class="flex items-center justify-between"
+                >
+                    <span>Started at</span>
+                    <span class="font-semibold">
+                        {{ new Date(job.started_at).toLocaleString() }}
+                    </span>
+                </div>
+                <div
+                    v-if="job.finished_at"
+                    class="flex items-center justify-between"
+                >
+                    <span>Finished at</span>
+                    <span class="font-semibold">
+                        {{ new Date(job.finished_at).toLocaleString() }}
                     </span>
                 </div>
             </div>

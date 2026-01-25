@@ -424,21 +424,21 @@
   * [x] Add “Start Bulk Shorten” action that creates a bulk import job and redirects to job page
   * [x] Acceptance: user can paste many URLs, submit, and be redirected to a job page
 
-* [ ] 28. Bulk import job model (DB) and lifecycle
+* [x] 28. Bulk import job model (DB) and lifecycle
 
-  * [ ] Create `bulk_import_jobs` table
+  * [x] Create `bulk_import_jobs` table
 
-    * [ ] Fields: id, user_id, domain_id, status, total_count, processed_count, success_count, failed_count, started_at, finished_at, timestamps
-  * [ ] Create `bulk_import_items` table
+    * [x] Fields: id, user_id, domain_id, status, total_count, processed_count, success_count, failed_count, started_at, finished_at, timestamps
+  * [x] Create `bulk_import_items` table
 
-    * [ ] Fields: job_id, row_number, source_url, status, link_id nullable, error_message nullable, qr_status, timestamps
-  * [ ] Define job statuses:
+    * [x] Fields: job_id, row_number, source_url, status, link_id nullable, error_message nullable, qr_status, timestamps
+  * [x] Define job statuses:
 
-    * [ ] pending, running, completed, completed_with_errors, failed, cancelled (optional)
-  * [ ] Define item statuses:
+    * [x] pending, running, completed, completed_with_errors, failed, cancelled (optional)
+  * [x] Define item statuses:
 
-    * [ ] queued, processing, succeeded, failed
-  * [ ] Acceptance: a submitted bulk request produces a job and items rows representing each input line
+    * [x] queued, processing, succeeded, failed
+  * [x] Acceptance: a submitted bulk request produces a job and items rows representing each input line
 
 * [ ] 29. Bulk processing pipeline (queues + idempotency)
 

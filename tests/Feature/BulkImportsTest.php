@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\BulkImportItem;
+use App\Models\BulkImportJob;
 use App\Models\Domain;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
 
 it('renders the bulk import page', function () {
     $user = User::factory()->create();
@@ -33,5 +34,8 @@ it('stores a bulk import request and redirects to the job page', function () {
     $jobId = $path ? basename($path) : null;
 
     expect($jobId)->not->toBeNull();
-    expect(Cache::get("bulk-imports:{$jobId}"))->not->toBeNull();
+
+    $job = BulkImportJob::query()->find($jobId);
+    expect($job)->not->toBeNull();
+    expect(BulkImportItem::query()->where('job_id', $jobId)->count())->toBe(2);
 });
