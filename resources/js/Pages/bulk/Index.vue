@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,6 +53,9 @@ const invalidLines = computed(() =>
 const validCount = computed(
     () => uniqueLines.value.length - invalidLines.value.length,
 );
+
+const hasInvalidLines = computed(() => invalidLines.value.length > 0);
+const canSubmit = computed(() => validCount.value > 0 && !hasInvalidLines.value);
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -164,10 +168,18 @@ https://example.com/third"
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <Button type="submit" :disabled="processing">
+                        <Button type="submit" :disabled="processing || !canSubmit">
                             {{ processing ? 'Starting...' : 'Start bulk shorten' }}
                         </Button>
                     </div>
+
+                    <Alert v-if="hasInvalidLines" variant="destructive">
+                        <AlertTitle>Fix invalid URLs</AlertTitle>
+                        <AlertDescription>
+                            Remove or correct invalid lines before starting the bulk
+                            import.
+                        </AlertDescription>
+                    </Alert>
                 </Form>
 
                 <div

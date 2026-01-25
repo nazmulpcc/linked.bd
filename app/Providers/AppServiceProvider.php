@@ -62,5 +62,21 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute($limit)->by($key);
         });
+
+        RateLimiter::for('api-token', function ($request) {
+            $tokenId = $request->user()?->currentAccessToken()?->id;
+            $key = $tokenId ? "token:{$tokenId}" : ($request->user()?->id ?? $request->ip());
+            $limit = (int) config('api.rate_limits.api_per_token', 120);
+
+            return Limit::perMinute($limit)->by($key);
+        });
+
+        RateLimiter::for('bulk-import', function ($request) {
+            $tokenId = $request->user()?->currentAccessToken()?->id;
+            $key = $tokenId ? "token:{$tokenId}" : ($request->user()?->id ?? $request->ip());
+            $limit = (int) config('api.rate_limits.bulk_per_token', 5);
+
+            return Limit::perMinute($limit)->by($key);
+        });
     }
 }

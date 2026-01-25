@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\MeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
-    ->middleware('auth:sanctum')
+    ->middleware(['auth:sanctum', 'throttle:api-token'])
     ->group(function (): void {
         Route::get('/me', MeController::class)->name('api.me');
 
@@ -52,7 +52,9 @@ Route::prefix('v1')
                 });
 
                 Route::middleware('abilities:bulk:write')->group(function (): void {
-                    Route::post('/', [BulkImportsController::class, 'store'])->name('store');
+                    Route::post('/', [BulkImportsController::class, 'store'])
+                        ->middleware('throttle:bulk-import')
+                        ->name('store');
                 });
             });
     });

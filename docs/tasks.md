@@ -528,20 +528,20 @@
   * [x] Keep docs aligned with API behavior (versioning note)
   * [x] Acceptance: user can view API docs and successfully call endpoints using described auth
 
-* [ ] 34. Permissions, consistency, and UX polish for bulk + API
+* [x] 34. Permissions, consistency, and UX polish for bulk + API
 
-  * [ ] Ensure ownership enforcement across:
+  * [x] Ensure ownership enforcement across:
 
-    * [ ] Links created by bulk job
-    * [ ] Bulk job visibility
-    * [ ] QR downloads
-  * [ ] Add rate limits:
+    * [x] Links created by bulk job
+    * [x] Bulk job visibility
+    * [x] QR downloads
+  * [x] Add rate limits:
 
-    * [ ] Bulk submission per user/token
-    * [ ] API calls per token (basic)
-  * [ ] Add clear UI empty/error states:
+    * [x] Bulk submission per user/token
+    * [x] API calls per token (basic)
+  * [x] Add clear UI empty/error states:
 
-    * [ ] Bulk validation errors (invalid lines)
-    * [ ] Job failed/cancelled states
-    * [ ] Token creation/revocation confirmations
-  * [ ] Acceptance: bulk + API features are safe, consistent, and user-friendly
+    * [x] Bulk validation errors (invalid lines)
+    * [x] Job failed/cancelled states
+    * [x] Token creation/revocation confirmations
+  * [x] Acceptance: bulk + API features are safe, consistent, and user-friendly

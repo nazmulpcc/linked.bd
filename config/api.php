@@ -15,4 +15,8 @@ return [
             'write' => 'bulk:write',
         ],
     ],
+    'rate_limits' => [
+        'api_per_token' => 120,
+        'bulk_per_token' => 5,
+    ],
 ];

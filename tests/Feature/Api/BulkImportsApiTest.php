@@ -86,3 +86,49 @@ it('lists bulk import items via the api', function () {
     expect(collect($response->json('data'))->pluck('id')->all())
         ->toContain($items->first()->id);
 });
+
+it('does not allow accessing another user bulk job status', function () {
+    $owner = User::factory()->create();
+    $job = BulkImportJob::factory()->create([
+        'user_id' => $owner->id,
+        'domain_id' => Domain::factory()->verified()->create([
+            'user_id' => $owner->id,
+        ])->id,
+    ]);
+
+    $otherUser = User::factory()->create();
+    $token = $otherUser->createToken('api', [
+        config('api.abilities.bulk.read'),
+    ])->plainTextToken;
+
+    $response = $this->getJson("/api/v1/bulk-imports/{$job->id}", [
+        'Authorization' => 'Bearer '.$token,
+    ]);
+
+    $response->assertNotFound();
+});
+
+it('does not allow accessing another user bulk job items', function () {
+    $owner = User::factory()->create();
+    $job = BulkImportJob::factory()->create([
+        'user_id' => $owner->id,
+        'domain_id' => Domain::factory()->verified()->create([
+            'user_id' => $owner->id,
+        ])->id,
+    ]);
+
+    BulkImportItem::factory()->count(2)->create([
+        'job_id' => $job->id,
+    ]);
+
+    $otherUser = User::factory()->create();
+    $token = $otherUser->createToken('api', [
+        config('api.abilities.bulk.read'),
+    ])->plainTextToken;
+
+    $response = $this->getJson("/api/v1/bulk-imports/{$job->id}/items", [
+        'Authorization' => 'Bearer '.$token,
+    ]);
+
+    $response->assertNotFound();
+});

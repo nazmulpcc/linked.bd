@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Heading from '@/components/Heading.vue';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { index } from '@/routes/bulk-imports';
@@ -71,6 +72,34 @@ const statusLabel = computed(() =>
     jobState.value.status.replaceAll('_', ' '),
 );
 
+const statusNotice = computed(() => {
+    if (jobState.value.status === 'failed') {
+        return {
+            title: 'Bulk job failed',
+            description: 'We could not finish processing this batch. Try again or start a new job.',
+            variant: 'destructive',
+        };
+    }
+
+    if (jobState.value.status === 'cancelled') {
+        return {
+            title: 'Bulk job cancelled',
+            description: 'This job was cancelled before completion.',
+            variant: 'destructive',
+        };
+    }
+
+    if (jobState.value.status === 'completed_with_errors') {
+        return {
+            title: 'Completed with errors',
+            description: 'Some URLs failed to process. Review the item list below for details.',
+            variant: 'default',
+        };
+    }
+
+    return null;
+});
+
 const channelName = computed(() => `bulk-imports.${jobState.value.id}`);
 
 const applyItemUpdates = (updates: Item[]) => {
@@ -133,6 +162,13 @@ onBeforeUnmount(() => {
                     title="Job summary"
                     description="Updates in real time as the batch is processed."
                 />
+
+                <Alert v-if="statusNotice" class="mt-4" :variant="statusNotice.variant">
+                    <AlertTitle>{{ statusNotice.title }}</AlertTitle>
+                    <AlertDescription>
+                        {{ statusNotice.description }}
+                    </AlertDescription>
+                </Alert>
 
                 <div class="mt-6 grid gap-4 text-sm">
                     <div class="flex items-center justify-between">
