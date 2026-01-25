@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $processed_count
  * @property int $success_count
  * @property int $failed_count
+ * @property string|null $default_password_hash
+ * @property \Illuminate\Support\Carbon|null $default_expires_at
  * @property \Illuminate\Support\Carbon|null $started_at
  * @property \Illuminate\Support\Carbon|null $finished_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -60,6 +62,7 @@ class BulkImportJob extends Model
             'processed_count' => 'integer',
             'success_count' => 'integer',
             'failed_count' => 'integer',
+            'default_expires_at' => 'datetime',
             'started_at' => 'datetime',
             'finished_at' => 'datetime',
         ];

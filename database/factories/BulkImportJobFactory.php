@@ -29,6 +29,8 @@ class BulkImportJobFactory extends Factory
             'processed_count' => 0,
             'success_count' => 0,
             'failed_count' => 0,
+            'default_password_hash' => null,
+            'default_expires_at' => null,
             'started_at' => null,
             'finished_at' => null,
         ];

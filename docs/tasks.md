@@ -440,29 +440,29 @@
     * [x] queued, processing, succeeded, failed
   * [x] Acceptance: a submitted bulk request produces a job and items rows representing each input line
 
-* [ ] 29. Bulk processing pipeline (queues + idempotency)
+* [x] 29. Bulk processing pipeline (queues + idempotency)
 
-  * [ ] Create job dispatch flow:
+  * [x] Create job dispatch flow:
 
-    * [ ] Upon bulk submission, enqueue a “ProcessBulkImportJob” (or chunked jobs)
-  * [ ] Implement processing strategy:
+    * [x] Upon bulk submission, enqueue a “ProcessBulkImportJob” (or chunked jobs)
+  * [x] Implement processing strategy:
 
-    * [ ] Parse + normalize URLs
-    * [ ] Validate scheme and safety rules
-    * [ ] Create link (code/alias rules same as normal create)
-    * [ ] Enqueue QR generation per created link (existing worker)
-    * [ ] Update item row with short URL/link_id and status
-    * [ ] Update aggregate counters on bulk_import_jobs
-  * [ ] Chunking/backpressure:
+    * [x] Parse + normalize URLs
+    * [x] Validate scheme and safety rules
+    * [x] Create link (code/alias rules same as normal create)
+    * [x] Enqueue QR generation per created link (existing worker)
+    * [x] Update item row with short URL/link_id and status
+    * [x] Update aggregate counters on bulk_import_jobs
+  * [x] Chunking/backpressure:
 
-    * [ ] Process items in batches to avoid long-running single jobs
-    * [ ] Ensure retries do not duplicate links (idempotent handling per item)
-  * [ ] Failure handling:
+    * [x] Process items in batches to avoid long-running single jobs
+    * [x] Ensure retries do not duplicate links (idempotent handling per item)
+  * [x] Failure handling:
 
-    * [ ] Record error_message per item
-    * [ ] Continue processing other items
-    * [ ] Finalize job status correctly
-  * [ ] Acceptance: bulk jobs reliably process large inputs without timeouts; failures are per-row
+    * [x] Record error_message per item
+    * [x] Continue processing other items
+    * [x] Finalize job status correctly
+  * [x] Acceptance: bulk jobs reliably process large inputs without timeouts; failures are per-row
 
 * [ ] 30. Bulk job page UI (real-time updates)
 

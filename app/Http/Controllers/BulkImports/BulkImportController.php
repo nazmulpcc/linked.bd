@@ -9,6 +9,7 @@ use App\Models\BulkImportJob;
 use App\Models\Domain;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -47,6 +48,8 @@ class BulkImportController extends Controller
             ]);
         }
 
+        $password = $request->string('password')->toString();
+
         $job = BulkImportJob::query()->create([
             'user_id' => $request->user()->id,
             'domain_id' => $domain->id,
@@ -55,6 +58,8 @@ class BulkImportController extends Controller
             'processed_count' => 0,
             'success_count' => 0,
             'failed_count' => 0,
+            'default_password_hash' => $password === '' ? null : Hash::make($password),
+            'default_expires_at' => $request->input('expires_at'),
             'started_at' => null,
             'finished_at' => null,
         ]);
@@ -73,6 +78,8 @@ class BulkImportController extends Controller
         }
 
         BulkImportItem::query()->insert($items);
+
+        \App\Jobs\BulkImports\ProcessBulkImportJob::dispatch($job->id);
 
         return to_route('bulk-imports.show', ['job' => $job->id])
             ->with('success', 'Bulk import started.');
