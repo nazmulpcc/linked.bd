@@ -412,17 +412,17 @@
     * [x] Download QR (or return signed URL)
   * [x] Acceptance: API supports all required operations with scope enforcement
 
-* [ ] 27. Bulk shorten UX (dashboard)
+* [x] 27. Bulk shorten UX (dashboard)
 
-  * [ ] Add “Bulk Shorten” entry point in dashboard
-  * [ ] Build bulk shorten form:
+  * [x] Add “Bulk Shorten” entry point in dashboard
+  * [x] Build bulk shorten form:
 
-    * [ ] Large textarea; one URL per line
-    * [ ] Domain selector (platform + verified custom domains)
-    * [ ] Optional defaults: password, expiry (apply to all or disabled for bulk v1)
-    * [ ] Validation summary: count lines, show invalid lines, deduplicate option
-  * [ ] Add “Start Bulk Shorten” action that creates a bulk import job and redirects to job page
-  * [ ] Acceptance: user can paste many URLs, submit, and be redirected to a job page
+    * [x] Large textarea; one URL per line
+    * [x] Domain selector (platform + verified custom domains)
+    * [x] Optional defaults: password, expiry (apply to all or disabled for bulk v1)
+    * [x] Validation summary: count lines, show invalid lines, deduplicate option
+  * [x] Add “Start Bulk Shorten” action that creates a bulk import job and redirects to job page
+  * [x] Acceptance: user can paste many URLs, submit, and be redirected to a job page
 
 * [ ] 28. Bulk import job model (DB) and lifecycle
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleOAuthController;
+use App\Http\Controllers\BulkImports\BulkImportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Domains\DomainController;
 use App\Http\Controllers\Links\LinkController;
@@ -47,6 +48,13 @@ Route::middleware(['auth', 'verified'])
             ->name('links.destroy');
         Route::get('/links/{link:ulid}/qr', [LinkQrController::class, 'download'])
             ->name('links.qr.download');
+
+        Route::get('/bulk-imports', [BulkImportController::class, 'index'])
+            ->name('bulk-imports.index');
+        Route::post('/bulk-imports', [BulkImportController::class, 'store'])
+            ->name('bulk-imports.store');
+        Route::get('/bulk-imports/{job}', [BulkImportController::class, 'show'])
+            ->name('bulk-imports.show');
 
         Route::middleware(['auth', 'verified'])
             ->prefix('domains')
