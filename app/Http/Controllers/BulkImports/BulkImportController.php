@@ -84,7 +84,7 @@ class BulkImportController extends Controller
 
         BulkImportItem::query()->insert($items);
 
-        \App\Jobs\BulkImports\ProcessBulkImportJob::dispatch($job->id);
+        \App\Jobs\BulkImports\ProcessBulkImportJob::dispatch($job);
 
         return to_route('bulk-imports.show', ['job' => $job->id])
             ->with('success', 'Bulk import started.');

@@ -18,14 +18,14 @@ class ProcessBulkImportJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public int $jobId) {}
+    public function __construct(public BulkImportJob $job) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $job = BulkImportJob::query()->find($this->jobId);
+        $job = $this->job->fresh();
 
         if (! $job) {
             return;

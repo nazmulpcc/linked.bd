@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bulk_import_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('job_id')
+            $table->foreignUlid('job_id')
                 ->constrained('bulk_import_jobs')
                 ->cascadeOnDelete();
             $table->unsignedInteger('row_number');
