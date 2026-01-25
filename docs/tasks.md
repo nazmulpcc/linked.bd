@@ -380,16 +380,16 @@
   * [x] Implement API auth middleware and consistent error format
   * [x] Acceptance: authenticated API requests work using personal access tokens and scopes
 
-* [ ] 25. API token management UI (dashboard)
+* [x] 25. API token management UI (dashboard)
 
-  * [ ] Create UI page: API Tokens
+  * [x] Create UI page: API Tokens
 
-    * [ ] List tokens (name, created_at, last_used_at, scopes)
-    * [ ] Create token (name + scopes selection)
-    * [ ] Revoke token
-  * [ ] One-time token display on creation (copy UX + warning)
-  * [ ] Ensure only token owner can manage tokens
-  * [ ] Acceptance: user can create/revoke tokens and use them for API calls
+    * [x] List tokens (name, created_at, last_used_at, scopes)
+    * [x] Create token (name + scopes selection)
+    * [x] Revoke token
+  * [x] One-time token display on creation (copy UX + warning)
+  * [x] Ensure only token owner can manage tokens
+  * [x] Acceptance: user can create/revoke tokens and use them for API calls
 
 * [ ] 26. API endpoints: links/domains/QR parity with UI
 
