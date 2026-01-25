@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { index } from '@/routes/bulk-imports';
 import { type BreadcrumbItem } from '@/types';
-import BulkImportController from '@/actions/App/Http/Controllers/BulkImports/BulkImportController';
+import { store } from '@/routes/bulk-imports';
 import { Form, Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
@@ -73,7 +73,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
             <section class="rounded-2xl border border-border/70 bg-card p-6">
                 <Form
                     v-if="domains.length"
-                    v-bind="BulkImportController.store.form()"
+                    :action="store().url"
+                    method="post"
                     v-slot="{ errors, processing }"
                     class="grid gap-6"
                 >
