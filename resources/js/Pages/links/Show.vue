@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import DynamicRuleBuilder from '@/pages/links/components/DynamicRuleBuilder.vue';
-import { createCondition, createRule, type Rule, type RuleCondition } from '@/pages/links/components/dynamicTypes';
+import DynamicRuleBuilder from '@/Pages/links/components/DynamicRuleBuilder.vue';
+import { createCondition, createRule, type Rule, type RuleCondition } from '@/Pages/links/components/dynamicTypes';
 import links, { index as linksIndex } from '@/routes/links';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';

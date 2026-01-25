@@ -118,6 +118,7 @@ const copyToken = async (): Promise<void> => {
 
                 <Form
                     v-bind="ApiTokenController.store.form()"
+                    :reset-on-success="['name', 'abilities']"
                     class="space-y-6"
                     v-slot="{ errors, processing }"
                 >

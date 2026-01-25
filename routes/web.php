@@ -47,17 +47,17 @@ Route::middleware(['auth', 'verified'])
             ->name('links.destroy');
         Route::get('/links/{link:ulid}/qr', [LinkQrController::class, 'download'])
             ->name('links.qr.download');
-    });
 
-Route::middleware(['auth', 'verified'])
-    ->prefix('domains')
-    ->name('domains.')
-    ->group(function () {
-        Route::get('/', [DomainController::class, 'index'])->name('index');
-        Route::post('/', [DomainController::class, 'store'])->name('store');
-        Route::post('/{domain}/verify', [DomainController::class, 'verify'])->name('verify');
-        Route::post('/{domain}/disable', [DomainController::class, 'disable'])->name('disable');
-        Route::delete('/{domain}', [DomainController::class, 'destroy'])->name('destroy');
+        Route::middleware(['auth', 'verified'])
+            ->prefix('domains')
+            ->name('domains.')
+            ->group(function () {
+                Route::get('/', [DomainController::class, 'index'])->name('index');
+                Route::post('/', [DomainController::class, 'store'])->name('store');
+                Route::post('/{domain}/verify', [DomainController::class, 'verify'])->name('verify');
+                Route::post('/{domain}/disable', [DomainController::class, 'disable'])->name('disable');
+                Route::delete('/{domain}', [DomainController::class, 'destroy'])->name('destroy');
+            });
     });
 
 require __DIR__.'/settings.php';

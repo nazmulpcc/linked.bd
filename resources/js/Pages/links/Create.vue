@@ -2,10 +2,10 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
-import DynamicLinkFields from '@/pages/links/components/DynamicLinkFields.vue';
-import StaticLinkFields from '@/pages/links/components/StaticLinkFields.vue';
-import { createRule, type Rule } from '@/pages/links/components/dynamicTypes';
-import { store } from '@/routes/links';
+import DynamicLinkFields from '@/Pages/links/components/DynamicLinkFields.vue';
+import StaticLinkFields from '@/Pages/links/components/StaticLinkFields.vue';
+import { createRule, type Rule } from '@/Pages/links/components/dynamicTypes';
+import LinkController from '@/actions/App/Http/Controllers/Links/LinkController';
 import { Form, Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
@@ -49,7 +49,7 @@ const selectClass =
             <section class="rounded-2xl border border-border/70 bg-card p-6">
                 <Form
                     v-if="domains.length"
-                    v-bind="store.form()"
+                    v-bind="LinkController.store.form()"
                     v-slot="{ errors, processing }"
                     class="grid gap-6"
                 >
