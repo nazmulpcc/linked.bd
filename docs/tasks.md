@@ -500,33 +500,33 @@
   * [x] Add dashboard navigation entry
   * [x] Acceptance: user can find past bulk jobs and open their status pages
 
-* [ ] 32. Bulk import API endpoints
+* [x] 32. Bulk import API endpoints
 
-  * [ ] Create Bulk Job API
+  * [x] Create Bulk Job API
 
-    * [ ] Create job with list of URLs (array or newline string)
-    * [ ] Get job status (counts + status)
-    * [ ] List job items (paginated)
-  * [ ] Enforce scopes: bulk:read / bulk:write
-  * [ ] Acceptance: bulk import can be driven entirely via API
+    * [x] Create job with list of URLs (array or newline string)
+    * [x] Get job status (counts + status)
+    * [x] List job items (paginated)
+  * [x] Enforce scopes: bulk:read / bulk:write
+  * [x] Acceptance: bulk import can be driven entirely via API
 
-* [ ] 33. API documentation (OpenAPI) and docs page
+* [x] 33. API documentation (OpenAPI) and docs page
 
-  * [ ] Decide docs approach:
+  * [x] Decide docs approach:
 
-    * [ ] OpenAPI spec file maintained in repo
-    * [ ] UI renderer (Swagger UI / Redoc) served at a docs route
-  * [ ] Implement docs page (authenticated or public—choose one; default: authenticated)
-  * [ ] Document authentication:
+    * [x] OpenAPI spec file maintained in repo
+    * [x] UI renderer (Swagger UI / Redoc) served at a docs route
+  * [x] Implement docs page (authenticated or public—choose one; default: authenticated)
+  * [x] Document authentication:
 
-    * [ ] How to create token
-    * [ ] How to pass token (Authorization header)
-    * [ ] Scopes/abilities
-  * [ ] Document key endpoints with request/response schemas:
+    * [x] How to create token
+    * [x] How to pass token (Authorization header)
+    * [x] Scopes/abilities
+  * [x] Document key endpoints with request/response schemas:
 
-    * [ ] Links, Domains, QR, Bulk Jobs
-  * [ ] Keep docs aligned with API behavior (versioning note)
-  * [ ] Acceptance: user can view API docs and successfully call endpoints using described auth
+    * [x] Links, Domains, QR, Bulk Jobs
+  * [x] Keep docs aligned with API behavior (versioning note)
+  * [x] Acceptance: user can view API docs and successfully call endpoints using described auth
 
 * [ ] 34. Permissions, consistency, and UX polish for bulk + API
 

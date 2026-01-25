@@ -1,0 +1,508 @@
+openapi: 3.0.3
+info:
+  title: 'Laravel API Documentation'
+  description: 'API reference for the Linked URL shortener.'
+  version: 1.0.0
+servers:
+  -
+    url: 'https://linked.test'
+tags:
+  -
+    name: Endpoints
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.'
+security:
+  -
+    default: []
+paths:
+  /api/v1/me:
+    get:
+      summary: 'Handle the incoming request.'
+      operationId: handleTheIncomingRequest
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+  /api/v1/links:
+    get:
+      summary: ''
+      operationId: getApiV1Links
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Links
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                link_type:
+                  type: string
+                  description: ''
+                  example: dynamic
+                  enum:
+                    - static
+                    - dynamic
+                  nullable: true
+                destination_url:
+                  type: string
+                  description: 'Must be a valid URL. Must start with one of <code>http://</code> or <code>https://</code> Must not be greater than 2048 characters.'
+                  example: 'http://www.bailey.biz/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html'
+                fallback_destination_url:
+                  type: string
+                  description: 'Must be a valid URL. Must start with one of <code>http://</code> or <code>https://</code> Must not be greater than 2048 characters.'
+                  example: 'https://www.runte.com/ab-provident-perspiciatis-quo-omnis-nostrum-aut-adipisci'
+                  nullable: true
+                domain_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the domains table.'
+                  example: 16
+                alias:
+                  type: string
+                  description: 'Must match the regex /^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/. Must be at least 3 characters. Must not be greater than 50 characters.'
+                  example: 'n'
+                  nullable: true
+                password:
+                  type: string
+                  description: 'Must be at least 6 characters. Must not be greater than 255 characters.'
+                  example: '|{+-0pBNvYgx'
+                  nullable: true
+                expires_at:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                  example: '2052-02-19'
+                  nullable: true
+                rules:
+                  type: array
+                  description: 'Must have at least 1 items. Must not have more than 10 items.'
+                  example: null
+                  items:
+                    type: object
+                    properties:
+                      priority:
+                        type: integer
+                        description: 'Must be at least 1.'
+                        example: 22
+                      destination_url:
+                        type: string
+                        description: 'Must be a valid URL. Must start with one of <code>http://</code> or <code>https://</code> Must not be greater than 2048 characters.'
+                        example: 'http://crooks.biz/et-fugiat-sunt-nihil-accusantium'
+                      enabled:
+                        type: boolean
+                        description: ''
+                        example: false
+                        nullable: true
+                      conditions:
+                        type: array
+                        description: 'Must have at least 1 items. Must not have more than 8 items.'
+                        example:
+                          - []
+                        items:
+                          type: object
+                          properties:
+                            condition_type:
+                              type: string
+                              description: ''
+                              example: referrer_path
+                              enum:
+                                - country
+                                - device_type
+                                - operating_system
+                                - browser
+                                - referrer_domain
+                                - referrer_path
+                                - utm_source
+                                - utm_medium
+                                - utm_campaign
+                                - language
+                                - time_window
+                            operator:
+                              type: string
+                              description: ''
+                              example: not_equals
+                              enum:
+                                - equals
+                                - not_equals
+                                - in
+                                - not_in
+                                - contains
+                                - not_contains
+                                - starts_with
+                                - ends_with
+                                - regex
+                                - exists
+                                - not_exists
+                            value:
+                              type: string
+                              description: ''
+                              example: null
+                              nullable: true
+                          required:
+                            - condition_type
+                            - operator
+                    required:
+                      - priority
+                      - destination_url
+                      - conditions
+              required:
+                - destination_url
+                - domain_id
+  '/api/v1/links/{ulid}':
+    get:
+      summary: ''
+      operationId: getApiV1LinksUlid
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+    delete:
+      summary: ''
+      operationId: deleteApiV1LinksUlid
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: ulid
+        description: ''
+        example: 01KFN020G7JNYPFEAV7MR655Y6
+        required: true
+        schema:
+          type: string
+  '/api/v1/links/{link_ulid}/qr':
+    get:
+      summary: ''
+      operationId: getApiV1LinksLink_ulidQr
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: link_ulid
+        description: ''
+        example: 01KFN020G7JNYPFEAV7MR655Y6
+        required: true
+        schema:
+          type: string
+  /api/v1/domains:
+    get:
+      summary: ''
+      operationId: getApiV1Domains
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Domains
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hostname:
+                  type: string
+                  description: 'Must match the regex /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/. Must not be one of <code>linked.test</code> Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - hostname
+  '/api/v1/domains/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1DomainsId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+    delete:
+      summary: ''
+      operationId: deleteApiV1DomainsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the domain.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/domains/{domain_id}/disable':
+    post:
+      summary: ''
+      operationId: postApiV1DomainsDomain_idDisable
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: domain_id
+        description: 'The ID of the domain.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/domains/{domain_id}/verify':
+    post:
+      summary: ''
+      operationId: postApiV1DomainsDomain_idVerify
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: domain_id
+        description: 'The ID of the domain.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/bulk-imports/{job}':
+    get:
+      summary: ''
+      operationId: getApiV1BulkImportsJob
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: job
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/v1/bulk-imports/{job}/items':
+    get:
+      summary: ''
+      operationId: getApiV1BulkImportsJobItems
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: job
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/bulk-imports:
+    post:
+      summary: ''
+      operationId: postApiV1BulkImports
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                urls:
+                  type: string
+                  description: ''
+                  example: architecto
+                domain_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the domains table.'
+                  example: 16
+                password:
+                  type: string
+                  description: 'Must be at least 6 characters. Must not be greater than 255 characters.'
+                  example: ']|{+-0pBNvYg'
+                  nullable: true
+                expires_at:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                  example: '2052-02-19'
+                  nullable: true
+                deduplicate:
+                  type: boolean
+                  description: ''
+                  example: true
+                  nullable: true
+              required:
+                - urls
+                - domain_id
