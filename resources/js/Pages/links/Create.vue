@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DynamicLinkForm from '@/Pages/links/components/DynamicLinkForm.vue';
 import StaticLinkForm from '@/Pages/links/components/StaticLinkForm.vue';
-import { Head } from '@inertiajs/vue3';
+import { index as bulkIndex } from '@/routes/bulk-imports';
+import { Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 type Domain = {
@@ -58,6 +59,11 @@ const selectClass =
                         >
                             Dynamic link
                         </Button>
+                        <Link :href="bulkIndex()" class="inline-flex">
+                            <Button type="button" size="sm" variant="ghost" class="rounded-full">
+                                Bulk import
+                            </Button>
+                        </Link>
                     </div>
 
                     <StaticLinkForm
