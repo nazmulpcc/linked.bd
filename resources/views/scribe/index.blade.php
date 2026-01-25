@@ -26,7 +26,7 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "https://linked.test";
+        var tryItOutBaseUrl = "https://linked.bd";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
@@ -137,7 +137,7 @@
         <h1 id="introduction">Introduction</h1>
 <p>API reference for the Linked URL shortener.</p>
 <aside>
-    <strong>Base URL</strong>: <code>https://linked.test</code>
+    <strong>Base URL</strong>: <code>https://linked.bd</code>
 </aside>
 <pre><code>Use this API to manage links, domains, QR codes, and bulk imports.
 
@@ -166,7 +166,7 @@
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/me" \
+    --get "https://linked.bd/api/v1/me" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -174,7 +174,7 @@
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/me"
+    "https://linked.bd/api/v1/me"
 );
 
 const headers = {
@@ -308,7 +308,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/links" \
+    --get "https://linked.bd/api/v1/links" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -316,7 +316,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/links"
+    "https://linked.bd/api/v1/links"
 );
 
 const headers = {
@@ -450,7 +450,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6" \
+    --get "https://linked.bd/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -458,7 +458,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6"
+    "https://linked.bd/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6"
 );
 
 const headers = {
@@ -605,7 +605,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6/qr" \
+    --get "https://linked.bd/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6/qr" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -613,7 +613,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6/qr"
+    "https://linked.bd/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6/qr"
 );
 
 const headers = {
@@ -760,12 +760,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://linked.test/api/v1/links" \
+    "https://linked.bd/api/v1/links" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"link_type\": \"dynamic\",
+    \"link_type\": \"static\",
     \"destination_url\": \"http:\\/\\/www.bailey.biz\\/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html\",
     \"fallback_destination_url\": \"https:\\/\\/www.runte.com\\/ab-provident-perspiciatis-quo-omnis-nostrum-aut-adipisci\",
     \"domain_id\": 16,
@@ -776,11 +776,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
         {
             \"priority\": 22,
             \"destination_url\": \"http:\\/\\/crooks.biz\\/et-fugiat-sunt-nihil-accusantium\",
-            \"enabled\": true,
+            \"enabled\": false,
             \"conditions\": [
                 {
-                    \"condition_type\": \"utm_medium\",
-                    \"operator\": \"regex\"
+                    \"condition_type\": \"country\",
+                    \"operator\": \"not_equals\"
                 }
             ]
         }
@@ -791,7 +791,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/links"
+    "https://linked.bd/api/v1/links"
 );
 
 const headers = {
@@ -801,7 +801,7 @@ const headers = {
 };
 
 let body = {
-    "link_type": "dynamic",
+    "link_type": "static",
     "destination_url": "http:\/\/www.bailey.biz\/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html",
     "fallback_destination_url": "https:\/\/www.runte.com\/ab-provident-perspiciatis-quo-omnis-nostrum-aut-adipisci",
     "domain_id": 16,
@@ -812,11 +812,11 @@ let body = {
         {
             "priority": 22,
             "destination_url": "http:\/\/crooks.biz\/et-fugiat-sunt-nihil-accusantium",
-            "enabled": true,
+            "enabled": false,
             "conditions": [
                 {
-                    "condition_type": "utm_medium",
-                    "operator": "regex"
+                    "condition_type": "country",
+                    "operator": "not_equals"
                 }
             ]
         }
@@ -924,10 +924,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="link_type"                data-endpoint="POSTapi-v1-links"
-               value="dynamic"
+               value="static"
                data-component="body">
     <br>
-<p>Example: <code>dynamic</code></p>
+<p>Example: <code>static</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>static</code></li> <li><code>dynamic</code></li></ul>
         </div>
@@ -1057,7 +1057,7 @@ Must be one of:
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
                     </div>
                                                                 <div style=" margin-left: 14px; clear: unset;">
         <details>
@@ -1076,10 +1076,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="rules.0.conditions.0.condition_type"                data-endpoint="POSTapi-v1-links"
-               value="utm_medium"
+               value="country"
                data-component="body">
     <br>
-<p>Example: <code>utm_medium</code></p>
+<p>Example: <code>country</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>country</code></li> <li><code>device_type</code></li> <li><code>operating_system</code></li> <li><code>browser</code></li> <li><code>referrer_domain</code></li> <li><code>referrer_path</code></li> <li><code>utm_source</code></li> <li><code>utm_medium</code></li> <li><code>utm_campaign</code></li> <li><code>language</code></li> <li><code>time_window</code></li></ul>
                     </div>
@@ -1090,10 +1090,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="rules.0.conditions.0.operator"                data-endpoint="POSTapi-v1-links"
-               value="regex"
+               value="not_equals"
                data-component="body">
     <br>
-<p>Example: <code>regex</code></p>
+<p>Example: <code>not_equals</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>equals</code></li> <li><code>not_equals</code></li> <li><code>in</code></li> <li><code>not_in</code></li> <li><code>contains</code></li> <li><code>not_contains</code></li> <li><code>starts_with</code></li> <li><code>ends_with</code></li> <li><code>regex</code></li> <li><code>exists</code></li> <li><code>not_exists</code></li></ul>
                     </div>
@@ -1129,7 +1129,7 @@ Must be one of:
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "https://linked.test/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6" \
+    "https://linked.bd/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1137,7 +1137,7 @@ Must be one of:
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6"
+    "https://linked.bd/api/v1/links/01KFN020G7JNYPFEAV7MR655Y6"
 );
 
 const headers = {
@@ -1267,7 +1267,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/domains" \
+    --get "https://linked.bd/api/v1/domains" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1275,7 +1275,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/domains"
+    "https://linked.bd/api/v1/domains"
 );
 
 const headers = {
@@ -1409,7 +1409,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/domains/1" \
+    --get "https://linked.bd/api/v1/domains/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1417,7 +1417,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/domains/1"
+    "https://linked.bd/api/v1/domains/1"
 );
 
 const headers = {
@@ -1564,7 +1564,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://linked.test/api/v1/domains" \
+    "https://linked.bd/api/v1/domains" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -1576,7 +1576,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/domains"
+    "https://linked.bd/api/v1/domains"
 );
 
 const headers = {
@@ -1693,7 +1693,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value="b"
                data-component="body">
     <br>
-<p>Must match the regex /^(?!-)[A-Za-z0-9-]{1,63}(?&lt;!-)(.(?!-)[A-Za-z0-9-]{1,63}(?&lt;!-))*$/. Must not be one of <code>linked.test</code> Must not be greater than 255 characters. Example: <code>b</code></p>
+<p>Must match the regex /^(?!-)[A-Za-z0-9-]{1,63}(?&lt;!-)(.(?!-)[A-Za-z0-9-]{1,63}(?&lt;!-))*$/. Must not be one of <code>linked.bd</code> Must not be greater than 255 characters. Example: <code>b</code></p>
         </div>
         </form>
 
@@ -1711,7 +1711,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://linked.test/api/v1/domains/1/disable" \
+    "https://linked.bd/api/v1/domains/1/disable" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1719,7 +1719,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/domains/1/disable"
+    "https://linked.bd/api/v1/domains/1/disable"
 );
 
 const headers = {
@@ -1849,7 +1849,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "https://linked.test/api/v1/domains/1" \
+    "https://linked.bd/api/v1/domains/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1857,7 +1857,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/domains/1"
+    "https://linked.bd/api/v1/domains/1"
 );
 
 const headers = {
@@ -1987,7 +1987,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://linked.test/api/v1/domains/1/verify" \
+    "https://linked.bd/api/v1/domains/1/verify" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1995,7 +1995,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/domains/1/verify"
+    "https://linked.bd/api/v1/domains/1/verify"
 );
 
 const headers = {
@@ -2125,7 +2125,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/bulk-imports/architecto" \
+    --get "https://linked.bd/api/v1/bulk-imports/architecto" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2133,7 +2133,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/bulk-imports/architecto"
+    "https://linked.bd/api/v1/bulk-imports/architecto"
 );
 
 const headers = {
@@ -2280,7 +2280,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://linked.test/api/v1/bulk-imports/architecto/items" \
+    --get "https://linked.bd/api/v1/bulk-imports/architecto/items" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2288,7 +2288,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/bulk-imports/architecto/items"
+    "https://linked.bd/api/v1/bulk-imports/architecto/items"
 );
 
 const headers = {
@@ -2435,7 +2435,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://linked.test/api/v1/bulk-imports" \
+    "https://linked.bd/api/v1/bulk-imports" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -2451,7 +2451,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://linked.test/api/v1/bulk-imports"
+    "https://linked.bd/api/v1/bulk-imports"
 );
 
 const headers = {

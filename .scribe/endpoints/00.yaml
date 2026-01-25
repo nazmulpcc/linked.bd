@@ -230,7 +230,7 @@ endpoints:
         name: link_type
         description: ''
         required: false
-        example: dynamic
+        example: static
         type: string
         enumValues:
           - static
@@ -342,7 +342,7 @@ endpoints:
         name: 'rules[].enabled'
         description: ''
         required: false
-        example: true
+        example: false
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -365,7 +365,7 @@ endpoints:
         name: 'rules[].conditions[].condition_type'
         description: ''
         required: true
-        example: utm_medium
+        example: country
         type: string
         enumValues:
           - country
@@ -387,7 +387,7 @@ endpoints:
         name: 'rules[].conditions[].operator'
         description: ''
         required: true
-        example: regex
+        example: not_equals
         type: string
         enumValues:
           - equals
@@ -416,7 +416,7 @@ endpoints:
         nullable: true
         deprecated: false
     cleanBodyParameters:
-      link_type: dynamic
+      link_type: static
       destination_url: 'http://www.bailey.biz/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html'
       fallback_destination_url: 'https://www.runte.com/ab-provident-perspiciatis-quo-omnis-nostrum-aut-adipisci'
       domain_id: 16
@@ -427,11 +427,11 @@ endpoints:
         -
           priority: 22
           destination_url: 'http://crooks.biz/et-fugiat-sunt-nihil-accusantium'
-          enabled: true
+          enabled: false
           conditions:
             -
-              condition_type: utm_medium
-              operator: regex
+              condition_type: country
+              operator: not_equals
     fileParameters: []
     responses: []
     responseFields: []
@@ -616,7 +616,7 @@ endpoints:
       hostname:
         custom: []
         name: hostname
-        description: 'Must match the regex /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/. Must not be one of <code>linked.test</code> Must not be greater than 255 characters.'
+        description: 'Must match the regex /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$/. Must not be one of <code>linked.bd</code> Must not be greater than 255 characters.'
         required: true
         example: b
         type: string

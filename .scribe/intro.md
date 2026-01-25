@@ -3,7 +3,7 @@
 API reference for the Linked URL shortener.
 
 <aside>
-    <strong>Base URL</strong>: <code>https://linked.test</code>
+    <strong>Base URL</strong>: <code>https://linked.bd</code>
 </aside>
 
     Use this API to manage links, domains, QR codes, and bulk imports.
