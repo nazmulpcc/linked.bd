@@ -55,6 +55,8 @@ Route::middleware(['auth', 'verified'])
             ->name('bulk-imports.store');
         Route::get('/bulk-imports/{job}', [BulkImportController::class, 'show'])
             ->name('bulk-imports.show');
+        Route::get('/bulk-imports/{job}/items', [BulkImportController::class, 'items'])
+            ->name('bulk-imports.items');
 
         Route::middleware(['auth', 'verified'])
             ->prefix('domains')

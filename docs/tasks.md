@@ -464,32 +464,32 @@
     * [x] Finalize job status correctly
   * [x] Acceptance: bulk jobs reliably process large inputs without timeouts; failures are per-row
 
-* [ ] 30. Bulk job page UI (real-time updates)
+* [x] 30. Bulk job page UI (real-time updates)
 
-  * [ ] Create bulk job detail page:
+  * [x] Create bulk job detail page:
 
-    * [ ] Job header: status, counts, progress indicator
-    * [ ] Table: one row per item with columns:
+    * [x] Job header: status, counts, progress indicator
+    * [x] Table: one row per item with columns:
 
-      * [ ] Row number
-      * [ ] Long URL
-      * [ ] Short URL (when ready)
-      * [ ] QR status / QR preview (when ready)
-      * [ ] Error (if failed)
-  * [ ] Implement “live updates” transport:
+      * [x] Row number
+      * [x] Long URL
+      * [x] Short URL (when ready)
+      * [x] QR status / QR preview (when ready)
+      * [x] Error (if failed)
+  * [x] Implement “live updates” transport:
 
-    * [ ] Option A: polling endpoint (simple day-one)
+    * [x] Option A: polling endpoint (simple day-one)
     * [ ] Option B: websockets/broadcasting (only if already present)
-  * [ ] Implement incremental UI update behavior:
+  * [x] Implement incremental UI update behavior:
 
-    * [ ] Refresh changed rows only
-    * [ ] Show “QR generating” until QR ready
-  * [ ] Add actions:
+    * [x] Refresh changed rows only
+    * [x] Show “QR generating” until QR ready
+  * [x] Add actions:
 
-    * [ ] Download QR for a row (when ready)
+    * [x] Download QR for a row (when ready)
     * [ ] Copy short URL
     * [ ] Export results (CSV) (optional but high value)
-  * [ ] Acceptance: job page updates as links/QRs are generated; user sees progress in near real-time
+  * [x] Acceptance: job page updates as links/QRs are generated; user sees progress in near real-time
 
 * [ ] 31. Bulk jobs list and navigation
 

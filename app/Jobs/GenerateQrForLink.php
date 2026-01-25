@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Events\LinkQrGenerated;
+use App\Models\BulkImportItem;
 use App\Models\Link;
 use App\Models\LinkAccessToken;
 use Endroid\QrCode\QrCode;
@@ -56,6 +57,13 @@ class GenerateQrForLink implements ShouldQueue
         if ($link->wasChanged('qr_path') === false) {
             return;
         }
+
+        BulkImportItem::query()
+            ->where('link_id', $link->id)
+            ->update([
+                'qr_status' => 'ready',
+                'updated_at' => now(),
+            ]);
 
         $token = LinkAccessToken::query()
             ->where('link_id', $link->id)
