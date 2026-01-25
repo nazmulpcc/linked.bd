@@ -478,8 +478,8 @@
       * [x] Error (if failed)
   * [x] Implement “live updates” transport:
 
-    * [x] Option A: polling endpoint (simple day-one)
-    * [ ] Option B: websockets/broadcasting (only if already present)
+    * [ ] Option A: polling endpoint (simple day-one)
+    * [x] Option B: websockets/broadcasting (only if already present)
   * [x] Implement incremental UI update behavior:
 
     * [x] Refresh changed rows only

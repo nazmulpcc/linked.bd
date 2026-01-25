@@ -3,6 +3,7 @@
 namespace App\Jobs\BulkImports;
 
 use App\Enums\LinkType;
+use App\Events\BulkImportJobUpdated;
 use App\Events\LinkCreated;
 use App\Models\BulkImportItem;
 use App\Models\BulkImportJob;
@@ -21,12 +22,9 @@ class ProcessBulkImportChunk implements ShouldQueue
     use Queueable;
 
     /**
-     * Create a new job instance.
-     */
-    /**
      * @param  array<int, int>  $itemIds
      */
-    public function __construct(public int $jobId, public array $itemIds) {}
+    public function __construct(public string $jobId, public array $itemIds) {}
 
     /**
      * Execute the job.
@@ -159,6 +157,16 @@ class ProcessBulkImportChunk implements ShouldQueue
 
         BulkImportJob::query()->where('id', $job->id)->increment('processed_count');
         BulkImportJob::query()->where('id', $job->id)->increment('failed_count');
+
+        DB::afterCommit(static function () use ($job, $item): void {
+            $freshJob = BulkImportJob::query()->find($job->id);
+
+            if (! $freshJob) {
+                return;
+            }
+
+            event(new BulkImportJobUpdated($freshJob, [$item->id]));
+        });
     }
 
     private function markItemSucceeded(BulkImportJob $job, BulkImportItem $item, ?Link $link): void
@@ -182,6 +190,16 @@ class ProcessBulkImportChunk implements ShouldQueue
 
         BulkImportJob::query()->where('id', $job->id)->increment('processed_count');
         BulkImportJob::query()->where('id', $job->id)->increment('success_count');
+
+        DB::afterCommit(static function () use ($job, $item): void {
+            $freshJob = BulkImportJob::query()->find($job->id);
+
+            if (! $freshJob) {
+                return;
+            }
+
+            event(new BulkImportJobUpdated($freshJob, [$item->id]));
+        });
     }
 
     private function normalizeUrl(string $url): ?string

@@ -2,13 +2,13 @@
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { index, items } from '@/routes/bulk-imports';
+import { index } from '@/routes/bulk-imports';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 type Job = {
-    id: number | string;
+    id: string;
     status: string;
     total_count: number;
     processed_count: number;
@@ -38,14 +38,10 @@ type Item = {
 const props = defineProps<{
     job: Job;
     items: Item[];
-    lastUpdatedAt: string | null;
 }>();
 
 const jobState = ref<Job>({ ...props.job });
 const itemsState = ref<Item[]>([...props.items]);
-const lastUpdatedAt = ref<string | null>(props.lastUpdatedAt);
-const polling = ref(false);
-const pollTimer = ref<number | null>(null);
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -71,15 +67,11 @@ const progress = computed(() => {
     );
 });
 
-const isDone = computed(() =>
-    ['completed', 'completed_with_errors', 'failed', 'cancelled'].includes(
-        jobState.value.status,
-    ),
-);
-
 const statusLabel = computed(() =>
     jobState.value.status.replaceAll('_', ' '),
 );
+
+const channelName = computed(() => `bulk-imports.${jobState.value.id}`);
 
 const applyItemUpdates = (updates: Item[]) => {
     if (!updates.length) {
@@ -100,61 +92,28 @@ const applyItemUpdates = (updates: Item[]) => {
     itemsState.value.sort((a, b) => a.row_number - b.row_number);
 };
 
-const pollUpdates = async () => {
-    if (polling.value || isDone.value) {
+onMounted(() => {
+    if (!window.Echo) {
         return;
     }
 
-    polling.value = true;
+    window.Echo.private(channelName.value).listen(
+        '.bulk.import.updated',
+        (event: { job?: Job; items?: Item[] }) => {
+            if (event.job) {
+                jobState.value = { ...jobState.value, ...event.job };
+            }
 
-    try {
-        const response = await fetch(
-            items(
-                { job: jobState.value.id },
-                {
-                    query: {
-                        since: lastUpdatedAt.value ?? undefined,
-                    },
-                },
-            ).url,
-            {
-                headers: {
-                    Accept: 'application/json',
-                },
-            },
-        );
-
-        if (!response.ok) {
-            return;
-        }
-
-        const payload = await response.json();
-
-        if (payload.job) {
-            jobState.value = { ...jobState.value, ...payload.job };
-        }
-
-        if (payload.items) {
-            applyItemUpdates(payload.items as Item[]);
-        }
-
-        if (payload.last_updated_at) {
-            lastUpdatedAt.value = payload.last_updated_at;
-        }
-    } catch (error) {
-        // ignore transient polling errors
-    } finally {
-        polling.value = false;
-    }
-};
-
-onMounted(() => {
-    pollTimer.value = window.setInterval(pollUpdates, 4000);
+            if (event.items) {
+                applyItemUpdates(event.items);
+            }
+        },
+    );
 });
 
 onBeforeUnmount(() => {
-    if (pollTimer.value) {
-        window.clearInterval(pollTimer.value);
+    if (window.Echo) {
+        window.Echo.leave(channelName.value);
     }
 });
 </script>
@@ -172,7 +131,7 @@ onBeforeUnmount(() => {
                 <Heading
                     variant="small"
                     title="Job summary"
-                    description="Processing updates automatically every few seconds."
+                    description="Updates in real time as the batch is processed."
                 />
 
                 <div class="mt-6 grid gap-4 text-sm">

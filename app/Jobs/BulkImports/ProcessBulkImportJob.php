@@ -2,6 +2,7 @@
 
 namespace App\Jobs\BulkImports;
 
+use App\Events\BulkImportJobUpdated;
 use App\Models\BulkImportItem;
 use App\Models\BulkImportJob;
 use Illuminate\Bus\Batch;
@@ -18,14 +19,14 @@ class ProcessBulkImportJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public BulkImportJob $job) {}
+    public function __construct(public string $jobId) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $job = $this->job->fresh();
+        $job = BulkImportJob::query()->find($this->jobId);
 
         if (! $job) {
             return;
@@ -48,6 +49,8 @@ class ProcessBulkImportJob implements ShouldQueue
             'status' => BulkImportJob::STATUS_RUNNING,
             'started_at' => $job->started_at ?? Date::now(),
         ])->save();
+
+        event(new BulkImportJobUpdated($job));
 
         $itemIds = BulkImportItem::query()
             ->where('job_id', $job->id)
@@ -81,11 +84,17 @@ class ProcessBulkImportJob implements ShouldQueue
                         'status' => BulkImportJob::STATUS_FAILED,
                         'finished_at' => Date::now(),
                     ]);
+
+                $failedJob = BulkImportJob::query()->find($jobId);
+
+                if ($failedJob) {
+                    event(new BulkImportJobUpdated($failedJob));
+                }
             })
             ->dispatch();
     }
 
-    private static function finalizeJobById(int $jobId): void
+    private static function finalizeJobById(string $jobId): void
     {
         $job = BulkImportJob::query()->find($jobId);
 
@@ -110,5 +119,7 @@ class ProcessBulkImportJob implements ShouldQueue
                 : BulkImportJob::STATUS_COMPLETED,
             'finished_at' => Date::now(),
         ])->save();
+
+        event(new BulkImportJobUpdated($job));
     }
 }

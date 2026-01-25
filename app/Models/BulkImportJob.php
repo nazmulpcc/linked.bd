@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property int $id
+ * @property string $id
  * @property int $user_id
  * @property int $domain_id
  * @property string $status

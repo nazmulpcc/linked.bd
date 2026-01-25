@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\BulkImportJobUpdated;
 use App\Events\LinkQrGenerated;
 use App\Models\BulkImportItem;
 use App\Models\Link;
@@ -64,6 +65,21 @@ class GenerateQrForLink implements ShouldQueue
                 'qr_status' => 'ready',
                 'updated_at' => now(),
             ]);
+
+        $bulkItems = BulkImportItem::query()
+            ->where('link_id', $link->id)
+            ->with('job', 'link.domain')
+            ->get();
+
+        $bulkItems->groupBy('job_id')->each(function ($group): void {
+            $job = $group->first()?->job;
+
+            if (! $job) {
+                return;
+            }
+
+            event(new BulkImportJobUpdated($job, $group->pluck('id')->all()));
+        });
 
         $token = LinkAccessToken::query()
             ->where('link_id', $link->id)

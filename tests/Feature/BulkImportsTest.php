@@ -35,7 +35,7 @@ it('stores a bulk import request and redirects to the job page', function () {
 
     expect($jobId)->not->toBeNull();
 
-    $job = BulkImportJob::query()->find($jobId);
+    $job = BulkImportJob::query()->where('id', $jobId)->first();
     expect($job)->not->toBeNull();
-    expect(BulkImportItem::query()->where('job_id', $jobId)->count())->toBe(2);
+    expect(BulkImportItem::query()->where('job_id', $job->id)->count())->toBe(2);
 });
