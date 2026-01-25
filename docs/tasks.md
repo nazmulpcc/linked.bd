@@ -491,14 +491,14 @@
     * [ ] Export results (CSV) (optional but high value)
   * [x] Acceptance: job page updates as links/QRs are generated; user sees progress in near real-time
 
-* [ ] 31. Bulk jobs list and navigation
+* [x] 31. Bulk jobs list and navigation
 
-  * [ ] Create “Bulk Imports” list page:
+  * [x] Create “Bulk Imports” list page:
 
-    * [ ] Show recent jobs, status, counts, created_at
-    * [ ] Link to job detail
-  * [ ] Add dashboard navigation entry
-  * [ ] Acceptance: user can find past bulk jobs and open their status pages
+    * [x] Show recent jobs, status, counts, created_at
+    * [x] Link to job detail
+  * [x] Add dashboard navigation entry
+  * [x] Acceptance: user can find past bulk jobs and open their status pages
 
 * [ ] 32. Bulk import API endpoints
 

@@ -43,6 +43,27 @@ class BulkImportController extends Controller
         ]);
     }
 
+    public function history(Request $request): Response
+    {
+        $jobs = BulkImportJob::query()
+            ->where('user_id', $request->user()->id)
+            ->latest()
+            ->paginate(10)
+            ->through(fn (BulkImportJob $job) => [
+                'id' => $job->id,
+                'status' => $job->status,
+                'total_count' => $job->total_count,
+                'processed_count' => $job->processed_count,
+                'success_count' => $job->success_count,
+                'failed_count' => $job->failed_count,
+                'created_at' => optional($job->created_at)->toIso8601String(),
+            ]);
+
+        return Inertia::render('bulk/History', [
+            'jobs' => $jobs,
+        ]);
+    }
+
     public function store(StoreBulkImportRequest $request): RedirectResponse
     {
         $domain = $this->resolveDomainForUser($request);

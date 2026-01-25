@@ -11,7 +11,7 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { create, index as linksIndex } from '@/routes/links';
-import { index as bulkImportsIndex } from '@/routes/bulk-imports';
+import { history as bulkImportsHistory } from '@/routes/bulk-imports';
 import { dashboard, home, login } from '@/routes';
 import { index as domainsIndex } from '@/routes/domains';
 import type { NavItem } from '@/types';
@@ -48,7 +48,7 @@ const navItems = computed<AppNavItem[]>(() => [
     },
     {
         title: 'Bulk',
-        href: bulkImportsIndex(),
+        href: bulkImportsHistory(),
         requiresAuth: true,
     },
 ]);

@@ -51,6 +51,8 @@ Route::middleware(['auth', 'verified'])
 
         Route::get('/bulk-imports', [BulkImportController::class, 'index'])
             ->name('bulk-imports.index');
+        Route::get('/bulk-imports/history', [BulkImportController::class, 'history'])
+            ->name('bulk-imports.history');
         Route::post('/bulk-imports', [BulkImportController::class, 'store'])
             ->name('bulk-imports.store');
         Route::get('/bulk-imports/{job}', [BulkImportController::class, 'show'])
