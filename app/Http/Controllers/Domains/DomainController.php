@@ -71,7 +71,9 @@ class DomainController extends Controller
             ])->save();
         }
 
-        if ($verifier->handle($domain)) {
+        $result = $verifier->verify($domain);
+
+        if ($result['success']) {
             $domain->forceFill([
                 'status' => Domain::STATUS_VERIFIED,
                 'verified_at' => now(),
@@ -79,10 +81,10 @@ class DomainController extends Controller
 
             event(new DomainVerified($domain));
 
-            return to_route('domains.index')->with('success', 'Domain verified.');
+            return to_route('domains.index')->with('success', $result['message']);
         }
 
-        return to_route('domains.index')->with('error', 'Verification failed. Check your DNS record.');
+        return to_route('domains.index')->with('error', $result['message']);
     }
 
     public function disable(

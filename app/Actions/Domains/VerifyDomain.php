@@ -6,34 +6,57 @@ use App\Models\Domain;
 
 class VerifyDomain
 {
-    public function handle(Domain $domain): bool
+    /**
+     * @return array{success: bool, message: string}
+     */
+    public function verify(Domain $domain): array
     {
         if ($domain->verification_method !== Domain::VERIFICATION_DNS) {
-            return false;
+            return [
+                'success' => false,
+                'message' => 'Domain verification method is invalid.',
+            ];
         }
 
         $expectedTarget = $this->expectedTarget();
 
         if ($expectedTarget === '') {
-            return false;
+            return [
+                'success' => false,
+                'message' => 'Verification target is not configured.',
+            ];
         }
 
         $recordName = $domain->hostname;
         $records = dns_get_record($recordName, DNS_CNAME);
 
         if (! is_array($records)) {
-            return false;
+            return [
+                'success' => false,
+                'message' => 'No CNAME record found yet.',
+            ];
         }
 
         foreach ($records as $record) {
             $value = $record['target'] ?? $record['cname'] ?? null;
 
             if ($value && $this->normalizeCname($value) === $this->normalizeCname($expectedTarget)) {
-                return true;
+                return [
+                    'success' => true,
+                    'message' => 'Domain verified.',
+                ];
             }
         }
 
-        return false;
+        return [
+            'success' => false,
+            'message' => 'CNAME record does not point to the expected target.',
+        ];
+    }
+
+    public function handle(Domain $domain): bool
+    {
+        return $this->verify($domain)['success'];
     }
 
     private function expectedTarget(): string

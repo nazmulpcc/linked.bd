@@ -48,9 +48,9 @@ test('users can verify domains when dns check passes', function () {
 
     app()->instance(VerifyDomain::class, new class extends VerifyDomain
     {
-        public function handle(Domain $domain): bool
+        public function verify(Domain $domain): array
         {
-            return true;
+            return ['success' => true, 'message' => 'Domain verified.'];
         }
     });
 
@@ -71,9 +71,9 @@ test('domain verification fails when dns check fails', function () {
 
     app()->instance(VerifyDomain::class, new class extends VerifyDomain
     {
-        public function handle(Domain $domain): bool
+        public function verify(Domain $domain): array
         {
-            return false;
+            return ['success' => false, 'message' => 'CNAME record does not point to the expected target.'];
         }
     });
 
